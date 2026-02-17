@@ -1,4 +1,9 @@
-import React, { createContext, useState, useEffect, ReactNode } from "react";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
 import { api } from "../api/api";
 import { getToken, saveToken, removeToken } from "../utils/tokenStorage";
 
@@ -19,7 +24,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [userToken, setUserToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 🔎 Verifica token salvo ao iniciar o app
+  // 🔄 Carrega token salvo ao iniciar o app
   useEffect(() => {
     async function loadStoredToken() {
       try {
@@ -39,34 +44,45 @@ export function AuthProvider({ children }: AuthProviderProps) {
     loadStoredToken();
   }, []);
 
-  // 🔐 Login
+  // 🔐 LOGIN (OAuth2PasswordRequestForm)
   async function signIn(email: string, password: string) {
     try {
-      const response = await api.post("/login", {
-        email,
-        password,
+      const formData = new URLSearchParams();
+      formData.append("username", email);
+      formData.append("password", password);
+
+      const response = await api.post("/login", formData.toString(), {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
       });
 
       const { access_token } = response.data;
 
+      // Salva no storage
       await saveToken(access_token);
 
+      // Define header padrão
       api.defaults.headers.common[
         "Authorization"
       ] = `Bearer ${access_token}`;
 
       setUserToken(access_token);
-    } catch (error) {
-      console.log("Erro no login:", error);
+    } catch (error: any) {
+      console.log("Erro no login:", error?.response?.data || error.message);
       throw error;
     }
   }
 
-  // 🚪 Logout
+  // 🚪 LOGOUT
   async function signOut() {
-    await removeToken();
-    setUserToken(null);
-    delete api.defaults.headers.common["Authorization"];
+    try {
+      await removeToken();
+      setUserToken(null);
+      delete api.defaults.headers.common["Authorization"];
+    } catch (error) {
+      console.log("Erro no logout:", error);
+    }
   }
 
   return (
