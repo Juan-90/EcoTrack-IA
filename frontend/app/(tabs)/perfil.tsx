@@ -1,15 +1,15 @@
 import { View, Text, Button, StyleSheet } from "react-native";
 import { router } from "expo-router";
 
-export default function Login() {
-  function handleLogin() {
-    router.replace("/(tabs)/dashboard");
+export default function Perfil() {
+  function logout() {
+    router.replace("/login");
   }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>EcoTrack-IA</Text>
-      <Button title="Entrar" onPress={handleLogin} />
+      <Text style={styles.title}>Agente de Coleta</Text>
+      <Button title="Sair" onPress={logout} />
     </View>
   );
 }
@@ -21,9 +21,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontSize: 28,
+    fontSize: 20,
     marginBottom: 20,
-    fontWeight: "bold",
-    color: "#1B5E20",
   },
 });
