@@ -1,0 +1,30 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ecotrack-back
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app_root
+    environment:
+      - PYTHONPATH=/app_root
+      - DATABASE_URL=sqlite:////app_root/app/infrastructure/database/ecotrack.db
+      - PYTHONUNBUFFERED=1
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ecotrack-front
+    ports:
+      - "8081:8081"
+      - "19006:19006"
+    stdin_open: true
+    tty: true
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000
+    depends_on:
+      - backend
