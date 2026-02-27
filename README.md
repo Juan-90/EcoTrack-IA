@@ -148,6 +148,41 @@ Projeto desenvolvido no curso de **Desenvolvimento Web** do **IFSULDEMINAS** par
 
 ---
 
-## 📄 Licença
+## � Uso com Docker
+
+O backend e o frontend podem ser executados em containers para facilitar desenvolvimento e implantação.
+
+### Preparação
+1. Certifique‑se de ter [Docker](https://www.docker.com/) e `docker compose` instalados.
+2. Ajuste variáveis de ambiente no `docker-compose.yml` conforme necessário (ex.: `DATABASE_URL`, `REACT_APP_API_URL`).
+
+### Comandos úteis
+```bash
+# construir imagens (rebuild quando alterar código ou dependências)
+docker compose build
+
+# subir serviços em primeiro plano (logs são exibidos)
+docker compose up
+
+# subir em segundo plano (detached)
+docker compose up -d
+
+# visualizar logs do backend
+docker compose logs backend --follow --tail 200
+
+# parar e remover contêineres
+docker compose down
+```
+
+O backend ficará disponível em `http://localhost:5000` e o app Expo/React Native em `http://localhost:8081` (ou porta especificada).
+
+Se preferir, você pode entrar no container para executar comandos Python ou inspecionar arquivos:
+```bash
+docker exec -it ecotrack-back /bin/sh
+```
+
+---
+
+## �📄 Licença
 
 Projeto acadêmico desenvolvido para fins educacionais e de inovação tecnológica.
