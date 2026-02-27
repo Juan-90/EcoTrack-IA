@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity } from "react-native";
+import { router } from "expo-router";
 
 const lixeirasMock = [
-  { id: "1", nome: "Centro - Praça", nivel: 90 },
-  { id: "2", nome: "Bairro Florestal", nivel: 65 },
-  { id: "3", nome: "Universidade", nivel: 30 },
-  { id: "4", nome: "Rodoviária", nivel: 85 },
+  { id: "1", nome: "Centro - Praça", bairro: "Centro", nivel: 90 },
+  { id: "2", nome: "Bairro Florestal", bairro: "Florestal", nivel: 65 },
+  { id: "3", nome: "Universidade", bairro: "Universitário", nivel: 30 },
+  { id: "4", nome: "Rodoviária", bairro: "Centro", nivel: 85 },
 ];
 
 function getPriority(nivel: number) {
@@ -25,21 +26,20 @@ export default function Lixeiras() {
           const priority = getPriority(item.nivel);
 
           return (
-            <View style={styles.card}>
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() => router.push(`/lixeira/${item.id}`)}
+            >
               <Text style={styles.nome}>{item.nome}</Text>
+              <Text>Bairro: {item.bairro}</Text>
               <Text>Nível: {item.nivel}%</Text>
 
-              <View
-                style={[
-                  styles.badge,
-                  { backgroundColor: priority.color },
-                ]}
-              >
+              <View style={[styles.badge, { backgroundColor: priority.color }]}>
                 <Text style={styles.badgeText}>
                   Prioridade {priority.label}
                 </Text>
               </View>
-            </View>
+            </TouchableOpacity>
           );
         }}
       />
