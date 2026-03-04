@@ -1,53 +1,68 @@
-import { View, Text, StyleSheet, Button } from "react-native";
-import { useLocalSearchParams, router } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+  Dimensions,
+} from "react-native";
+import { useLocalSearchParams } from "expo-router";
+import { api } from "../../src/api/api";
 
-const lixeirasMock = [
-  { id: "1", nome: "Centro - Praça", bairro: "Centro", nivel: 90 },
-  { id: "2", nome: "Bairro Florestal", bairro: "Florestal", nivel: 65 },
-  { id: "3", nome: "Universidade", bairro: "Universitário", nivel: 30 },
-  { id: "4", nome: "Rodoviária", bairro: "Centro", nivel: 85 },
-];
+const { width } = Dimensions.get("window");
 
-function getPriority(nivel: number) {
-  if (nivel >= 80) return { label: "Alta", color: "#E53935" };
-  if (nivel >= 50) return { label: "Média", color: "#FB8C00" };
-  return { label: "Baixa", color: "#43A047" };
-}
-
-export default function DetalheLixeira() {
+export default function BinDetails() {
   const { id } = useLocalSearchParams();
+  const [bin, setBin] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const lixeira = lixeirasMock.find((item) => item.id === id);
+  useEffect(() => {
+    async function fetchBin() {
+      try {
+        const response = await api.get(`/lixeira/${id}`);
+        setBin(response.data);
+      } catch (error) {
+        console.error("Erro ao buscar detalhes:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
 
-  if (!lixeira) {
+    fetchBin();
+  }, []);
+
+  if (loading) {
     return (
-      <View style={styles.container}>
-        <Text>Lixeira não encontrada</Text>
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#22C55E" />
       </View>
     );
   }
 
-  const priority = getPriority(lixeira.nivel);
-
-  function marcarColetada() {
-    alert("Lixeira marcada como coletada!");
-    router.back();
+  if (!bin) {
+    return (
+      <View style={styles.centered}>
+        <Text style={{ color: "#fff" }}>Lixeira não encontrada.</Text>
+      </View>
+    );
   }
+
+  const levelWidth = (bin.level / 100) * (width - 40);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.nome}>{lixeira.nome}</Text>
-      <Text style={styles.info}>Bairro: {lixeira.bairro}</Text>
-      <Text style={styles.info}>Nível atual: {lixeira.nivel}%</Text>
+      <Text style={styles.title}>{bin.name}</Text>
 
-      <View style={[styles.badge, { backgroundColor: priority.color }]}>
-        <Text style={styles.badgeText}>
-          Prioridade {priority.label}
-        </Text>
-      </View>
+      <View style={styles.card}>
+        <Text style={styles.label}>Localização:</Text>
+        <Text style={styles.value}>{bin.location}</Text>
 
-      <View style={{ marginTop: 20 }}>
-        <Button title="Marcar como coletada" onPress={marcarColetada} />
+        <Text style={styles.label}>Nível atual:</Text>
+        <Text style={styles.value}>{bin.level}%</Text>
+
+        <View style={styles.graphContainer}>
+          <View style={[styles.graphFill, { width: levelWidth }]} />
+        </View>
       </View>
     </View>
   );
@@ -56,26 +71,43 @@ export default function DetalheLixeira() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#0F172A",
     padding: 20,
-    backgroundColor: "#F5F5F5",
   },
-  nome: {
-    fontSize: 22,
+  centered: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  title: {
+    fontSize: 24,
+    color: "#22C55E",
     fontWeight: "bold",
-    marginBottom: 15,
+    marginBottom: 20,
+    textAlign: "center",
   },
-  info: {
-    fontSize: 16,
-    marginBottom: 8,
+  card: {
+    backgroundColor: "#1E293B",
+    padding: 20,
+    borderRadius: 12,
   },
-  badge: {
+  label: {
+    color: "#94A3B8",
     marginTop: 10,
-    padding: 8,
-    borderRadius: 8,
-    alignSelf: "flex-start",
   },
-  badgeText: {
+  value: {
     color: "#fff",
-    fontWeight: "bold",
+    fontSize: 16,
+  },
+  graphContainer: {
+    height: 20,
+    backgroundColor: "#334155",
+    borderRadius: 10,
+    marginTop: 20,
+    overflow: "hidden",
+  },
+  graphFill: {
+    height: "100%",
+    backgroundColor: "#22C55E",
   },
 });
