@@ -1,68 +1,27 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  Dimensions,
-} from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import { useLocalSearchParams } from "expo-router";
-import { api } from "../../src/api/api";
-
-const { width } = Dimensions.get("window");
 
 export default function BinDetails() {
   const { id } = useLocalSearchParams();
-  const [bin, setBin] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchBin() {
-      try {
-        const response = await api.get(`/lixeira/${id}`);
-        setBin(response.data);
-      } catch (error) {
-        console.error("Erro ao buscar detalhes:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchBin();
-  }, []);
-
-  if (loading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#22C55E" />
-      </View>
-    );
-  }
-
-  if (!bin) {
-    return (
-      <View style={styles.centered}>
-        <Text style={{ color: "#fff" }}>Lixeira não encontrada.</Text>
-      </View>
-    );
-  }
-
-  const levelWidth = (bin.level / 100) * (width - 40);
+  const level = Math.floor(Math.random() * 100);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{bin.name}</Text>
+      <Text style={styles.title}>Lixeira #{id}</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.label}>Localização:</Text>
-        <Text style={styles.value}>{bin.location}</Text>
+      <Text style={styles.label}>Nível de ocupação</Text>
 
-        <Text style={styles.label}>Nível atual:</Text>
-        <Text style={styles.value}>{bin.level}%</Text>
+      <View style={styles.bar}>
+        <View style={[styles.fill, { width: `${level}%` }]} />
+      </View>
 
-        <View style={styles.graphContainer}>
-          <View style={[styles.graphFill, { width: levelWidth }]} />
-        </View>
+      <Text style={styles.percent}>{level}% cheio</Text>
+
+      <View style={styles.infoBox}>
+        <Text style={styles.info}>📍 Localização: Praça Central</Text>
+        <Text style={styles.info}>📡 Sensor: Ultrassônico</Text>
+        <Text style={styles.info}>🕒 Última leitura: agora</Text>
       </View>
     </View>
   );
@@ -71,43 +30,47 @@ export default function BinDetails() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0F172A",
     padding: 20,
+    backgroundColor: "#0f172a",
   },
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
+
   title: {
     fontSize: 24,
-    color: "#22C55E",
-    fontWeight: "bold",
+    color: "white",
     marginBottom: 20,
-    textAlign: "center",
   },
-  card: {
-    backgroundColor: "#1E293B",
-    padding: 20,
-    borderRadius: 12,
-  },
+
   label: {
-    color: "#94A3B8",
-    marginTop: 10,
+    color: "#94a3b8",
   },
-  value: {
-    color: "#fff",
-    fontSize: 16,
-  },
-  graphContainer: {
-    height: 20,
+
+  bar: {
+    height: 16,
     backgroundColor: "#334155",
     borderRadius: 10,
-    marginTop: 20,
-    overflow: "hidden",
+    marginTop: 10,
   },
-  graphFill: {
-    height: "100%",
-    backgroundColor: "#22C55E",
+
+  fill: {
+    height: 16,
+    backgroundColor: "#22c55e",
+    borderRadius: 10,
+  },
+
+  percent: {
+    color: "white",
+    marginTop: 10,
+  },
+
+  infoBox: {
+    marginTop: 30,
+    backgroundColor: "#1e293b",
+    padding: 15,
+    borderRadius: 10,
+  },
+
+  info: {
+    color: "#e2e8f0",
+    marginBottom: 6,
   },
 });

@@ -1,21 +1,23 @@
-import React, { useContext } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { AuthContext } from "../../src/store/AuthContext";
 
 export default function Profile() {
-  const { user, logout } = useContext(AuthContext);
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Perfil</Text>
 
       <View style={styles.card}>
-        <Text style={styles.label}>Email:</Text>
-        <Text style={styles.value}>{user?.email}</Text>
+        <Text style={styles.label}>Nome</Text>
+        <Text style={styles.value}>Operador de Coleta</Text>
+
+        <Text style={styles.label}>Email</Text>
+        <Text style={styles.value}>operador@ecotrack.com</Text>
+
+        <Text style={styles.label}>Coletas realizadas</Text>
+        <Text style={styles.value}>128</Text>
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={logout}>
-        <Text style={styles.buttonText}>Sair</Text>
+      <TouchableOpacity style={styles.logout}>
+        <Text style={styles.logoutText}>Sair</Text>
       </TouchableOpacity>
     </View>
   );
@@ -24,36 +26,43 @@ export default function Profile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0F172A",
-    padding: 16,
+    backgroundColor: "#0f172a",
+    padding: 20,
   },
+
   title: {
-    fontSize: 24,
-    color: "#22C55E",
+    fontSize: 26,
+    color: "#fff",
     fontWeight: "bold",
     marginBottom: 20,
-    textAlign: "center",
   },
+
   card: {
-    backgroundColor: "#1E293B",
+    backgroundColor: "#1e293b",
     padding: 20,
     borderRadius: 12,
-    marginBottom: 20,
   },
+
   label: {
-    color: "#94A3B8",
+    color: "#94a3b8",
+    marginTop: 10,
   },
+
   value: {
     color: "#fff",
     fontSize: 16,
+    fontWeight: "bold",
   },
-  button: {
-    backgroundColor: "#EF4444",
-    padding: 15,
+
+  logout: {
+    marginTop: 30,
+    backgroundColor: "#ef4444",
+    padding: 14,
     borderRadius: 10,
     alignItems: "center",
   },
-  buttonText: {
+
+  logoutText: {
     color: "#fff",
     fontWeight: "bold",
   },

@@ -1,133 +1,132 @@
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
-import { api } from "../../src/api/api";
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
 
+const bins = [
+  { id: 1, name: "Praça Central", level: 85 },
+  { id: 2, name: "Rua das Flores", level: 40 },
+  { id: 3, name: "Parque Municipal", level: 65 },
+  { id: 4, name: "Escola Municipal", level: 20 },
+];
+
 export default function Dashboard() {
-  const [bins, setBins] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    async function fetchBins() {
-      try {
-        setLoading(true);
-        const response = await api.get("/bins"); // endpoint do backend
-        setBins(response.data);
-      } catch (error) {
-        console.error("Erro ao buscar lixeiras:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchBins();
-  }, []);
-
-  const averageLevel =
-    bins.length > 0
-      ? Math.round(
-          bins.reduce((sum, b) => sum + Number(b.level), 0) / bins.length
-        )
-      : 0;
-
-  const onPressBin = (id: number) => {
-  router.push(`/lixeira/${id}`);
-};
-
-  if (loading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#22C55E" />
-      </View>
-    );
-  }
+  const criticalBins = bins.filter((b) => b.level > 80);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Dashboard</Text>
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>EcoTrack IA</Text>
 
-      <View style={styles.summary}>
-        <Text style={styles.summaryText}>
-          Total de lixeiras: {bins.length}
-        </Text>
-        <Text style={styles.summaryText}>
-          Média preenchimento: {averageLevel}%
-        </Text>
+      <View style={styles.cardsContainer}>
+        <View style={styles.card}>
+          <Text style={styles.cardNumber}>{bins.length}</Text>
+          <Text style={styles.cardLabel}>Lixeiras monitoradas</Text>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.cardNumber}>18</Text>
+          <Text style={styles.cardLabel}>Coletas hoje</Text>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.cardNumber}>{criticalBins.length}</Text>
+          <Text style={styles.cardLabel}>Lixeiras críticas</Text>
+        </View>
       </View>
 
-      <FlatList
-        data={bins}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={[
-              styles.binCard,
-              item.level > 85 && styles.cardAlert,
-            ]}
-            onPress={() => onPressBin(item.id)}
-          >
-            <Text style={styles.binName}>{item.name}</Text>
-            <Text style={styles.binLevel}>{item.level}%</Text>
-          </TouchableOpacity>
-        )}
-      />
-    </View>
+      <Text style={styles.sectionTitle}>Lixeiras com nível alto</Text>
+
+      {criticalBins.map((bin) => (
+        <TouchableOpacity
+          key={bin.id}
+          style={styles.binCard}
+          onPress={() => router.push(`/lixeira/${bin.id}`)}
+        >
+          <Text style={styles.binName}>{bin.name}</Text>
+
+          <View style={styles.levelBar}>
+            <View style={[styles.levelFill, { width: `${bin.level}%` }]} />
+          </View>
+
+          <Text style={styles.levelText}>{bin.level}% cheio</Text>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0F172A",
-    padding: 16,
+    padding: 20,
+    backgroundColor: "#0f172a",
   },
-  centered: {
-    flex: 1,
-    justifyContent: "center",
+
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "white",
+    marginBottom: 20,
+  },
+
+  cardsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 30,
+  },
+
+  card: {
+    backgroundColor: "#1e293b",
+    padding: 20,
+    borderRadius: 12,
+    width: "30%",
     alignItems: "center",
   },
-  title: {
-    fontSize: 26,
+
+  cardNumber: {
+    fontSize: 24,
     fontWeight: "bold",
-    color: "#22C55E",
-    marginBottom: 12,
+    color: "#22c55e",
+  },
+
+  cardLabel: {
+    color: "#94a3b8",
     textAlign: "center",
   },
-  summary: {
-    marginBottom: 20,
-    padding: 12,
-    backgroundColor: "#1E293B",
-    borderRadius: 10,
+
+  sectionTitle: {
+    color: "white",
+    fontSize: 18,
+    marginBottom: 10,
   },
-  summaryText: {
-    fontSize: 16,
-    color: "#fff",
-  },
+
   binCard: {
-    backgroundColor: "#1E293B",
-    padding: 14,
+    backgroundColor: "#1e293b",
+    padding: 15,
     borderRadius: 10,
     marginBottom: 12,
   },
-  cardAlert: {
-    backgroundColor: "#EF4444",
-  },
+
   binName: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  binLevel: {
+    color: "white",
     fontSize: 16,
-    color: "#fff",
+    marginBottom: 8,
+  },
+
+  levelBar: {
+    height: 8,
+    backgroundColor: "#334155",
+    borderRadius: 6,
+  },
+
+  levelFill: {
+    height: 8,
+    backgroundColor: "#22c55e",
+    borderRadius: 6,
+  },
+
+  levelText: {
+    color: "#94a3b8",
     marginTop: 6,
   },
 });

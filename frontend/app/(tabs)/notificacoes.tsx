@@ -1,9 +1,18 @@
-import React from "react";
-import { View, Text, FlatList, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, FlatList } from "react-native";
 
-const mockNotifications = [
-  { id: 1, message: "Lixeira Centro - 92% cheia", level: 92 },
-  { id: 2, message: "Lixeira Praça Norte - 87% cheia", level: 87 },
+const notifications = [
+  {
+    id: 1,
+    message: "🚨 Lixeira Hospital está 91% cheia",
+  },
+  {
+    id: 2,
+    message: "⚠️ Lixeira Centro precisa de coleta",
+  },
+  {
+    id: 3,
+    message: "✅ Coleta realizada na Lixeira Parque",
+  },
 ];
 
 export default function Notifications() {
@@ -12,7 +21,7 @@ export default function Notifications() {
       <Text style={styles.title}>Notificações</Text>
 
       <FlatList
-        data={mockNotifications}
+        data={notifications}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.card}>
@@ -27,24 +36,25 @@ export default function Notifications() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0F172A",
-    padding: 16,
+    backgroundColor: "#0f172a",
+    padding: 20,
   },
+
   title: {
-    fontSize: 24,
-    color: "#22C55E",
+    fontSize: 26,
+    color: "#fff",
     fontWeight: "bold",
     marginBottom: 20,
-    textAlign: "center",
   },
+
   card: {
-    backgroundColor: "#EF4444",
+    backgroundColor: "#1e293b",
     padding: 16,
-    borderRadius: 10,
-    marginBottom: 12,
+    borderRadius: 12,
+    marginBottom: 10,
   },
+
   text: {
     color: "#fff",
-    fontSize: 16,
   },
 });
