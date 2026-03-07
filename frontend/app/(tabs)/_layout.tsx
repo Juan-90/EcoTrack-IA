@@ -52,6 +52,27 @@ export default function TabsLayout() {
         name="mapa"
         options={{
           title: "Mapa",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="map" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="notificacoes"
+        options={{
+          title: "Notificações",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="notifications" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="configuracoes"
+        options={{
+          title: "Configurações",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="settings" size={size} color={color} />
+          ),
         }}
       />
     </Tabs>

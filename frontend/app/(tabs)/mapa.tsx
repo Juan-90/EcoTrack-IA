@@ -26,6 +26,7 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 24,
     marginBottom: 20,
+    fontWeight: "bold",
   },
 
   mapBox: {

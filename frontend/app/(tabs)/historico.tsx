@@ -30,13 +30,14 @@ export default function Historico() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2F2F2',
+    backgroundColor: '#0f172a',
     padding: 20,
   },
   title: {
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,
+    color: '#fff',
   },
   card: {
     backgroundColor: '#fff',
