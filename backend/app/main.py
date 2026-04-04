@@ -1,18 +1,63 @@
+# ─────────────────────────────────────────────────────────
+#  EcoTrack-IA — main.py
+#  Scheduler automático com lifespan (padrão FastAPI moderno)
+# ─────────────────────────────────────────────────────────
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from app.api.routes import bins
-from app.api import auth
-from app.infrastructure.database.database import engine, Base
-from app.domain.entities import user
-from app.api.routes import auth
+from fastapi.middleware.cors import CORSMiddleware
 
-Base.metadata.create_all(bind=engine)
+from app.infrastructure.database.database import create_tables
+from app.api.routes.auth      import router as auth_router
+from app.api.routes.bins      import router as bins_router
+from app.api.routes.trucks    import router as trucks_router
+from app.api.routes.routes    import router as routes_router
+from app.api.routes.analytics import router as analytics_router
+from app.api.routes.shifts    import router as shifts_router
+from app.core.scheduler       import start_scheduler, stop_scheduler
 
-app = FastAPI(title="EcoTrack-IA API")
+create_tables()
 
-app.include_router(bins.router)
-app.include_router(auth.router)
-app.include_router(auth.router)
 
-@app.get("/")
-def root():
-    return {"message": "EcoTrack-IA Backend Running 🚀"}
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    start_scheduler()   # ← executa no startup
+    yield
+    stop_scheduler()    # ← executa no shutdown
+
+
+app = FastAPI(
+    title="EcoTrack-IA API",
+    description="Sistema Inteligente de Gestão de Resíduos Urbanos — IFSULDEMINAS",
+    version="1.1.0",
+    lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://localhost:80",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(auth_router)
+app.include_router(bins_router)
+app.include_router(trucks_router)
+app.include_router(routes_router)
+app.include_router(analytics_router)
+app.include_router(shifts_router)
+
+
+@app.get("/", tags=["Health"])
+def health_check():
+    return {
+        "status":    "online",
+        "projeto":   "EcoTrack-IA",
+        "versao":    "1.1.0",
+        "scheduler": "ativo",
+        "docs":      "/docs",
+    }

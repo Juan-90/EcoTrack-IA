@@ -1,0 +1,31 @@
+# Dependências Node
+node_modules/
+web/node_modules/
+frontend/node_modules/
+
+# Build
+dist/
+build/
+web/dist/
+
+# Banco de dados SQLite
+*.db
+*.sqlite
+
+# Variáveis de ambiente (segurança)
+.env
+.env.local
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# VS Code
+.vscode/
+
+# Sistema
+.DS_Store
+Thumbs.db
