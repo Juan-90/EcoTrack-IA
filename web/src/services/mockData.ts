@@ -6,22 +6,22 @@
 import type { Bin, Truck, Route, DashboardStats } from '../types';
 
 export const MOCK_BINS: Bin[] = [
-  { id: 1, name: 'Hospital',          location: 'Av. Hospital, 100',        latitude: -22.1234, longitude: -45.9876, level: 92, priority: 'alta',  status: 'cheia',      last_collected: '2025-01-10T08:00:00', zone: 'Centro'   },
-  { id: 2, name: 'Praça Central',     location: 'Praça da República, s/n',  latitude: -22.1290, longitude: -45.9820, level: 88, priority: 'alta',  status: 'cheia',      last_collected: '2025-01-10T07:30:00', zone: 'Centro'   },
-  { id: 3, name: 'Parque Municipal',  location: 'Rua do Parque, 500',       latitude: -22.1350, longitude: -45.9750, level: 81, priority: 'alta',  status: 'ativa',      last_collected: '2025-01-09T16:00:00', zone: 'Norte'    },
-  { id: 4, name: 'Mercado Central',   location: 'Rua Comércio, 200',        latitude: -22.1200, longitude: -45.9900, level: 74, priority: 'media', status: 'ativa',      last_collected: '2025-01-10T06:00:00', zone: 'Centro'   },
-  { id: 5, name: 'Escola Estadual',   location: 'Av. Educação, 350',        latitude: -22.1400, longitude: -45.9800, level: 65, priority: 'media', status: 'ativa',      last_collected: '2025-01-09T14:00:00', zone: 'Sul'      },
-  { id: 6, name: 'Terminal de Ônibus',location: 'Rua Terminal, 1',          latitude: -22.1180, longitude: -45.9950, level: 58, priority: 'media', status: 'ativa',      last_collected: '2025-01-09T12:00:00', zone: 'Centro'   },
-  { id: 7, name: 'Ginásio Esportivo', location: 'Av. Esportes, 800',        latitude: -22.1450, longitude: -45.9700, level: 32, priority: 'baixa', status: 'ativa',      last_collected: '2025-01-09T10:00:00', zone: 'Leste'    },
-  { id: 8, name: 'Bairro Jardins',    location: 'Rua das Flores, 120',      latitude: -22.1500, longitude: -45.9650, level: 18, priority: 'baixa', status: 'ativa',      last_collected: '2025-01-08T16:00:00', zone: 'Jardins'  },
-  { id: 9, name: 'Biblioteca Pública',location: 'Rua Cultura, 45',          latitude: -22.1270, longitude: -45.9830, level: 45, priority: 'baixa', status: 'ativa',      last_collected: '2025-01-09T09:00:00', zone: 'Centro'   },
-  { id:10, name: 'UBS Norte',         location: 'Av. Saúde, 220',           latitude: -22.1100, longitude: -45.9770, level: 77, priority: 'media', status: 'ativa',      last_collected: '2025-01-09T08:00:00', zone: 'Norte'    },
+  { id: 1,  name: 'Hospital das Clínicas',  location: 'Av. Dr. Enéas de Carvalho Aguiar, 255', latitude: -23.5558, longitude: -46.6706, level: 92, priority: 'alta',  status: 'cheia',  last_collected: '2025-01-10T08:00:00', zone: 'Pinheiros'   },
+  { id: 2,  name: 'Parque Ibirapuera',      location: 'Av. Pedro Álvares Cabral, s/n',          latitude: -23.5874, longitude: -46.6576, level: 88, priority: 'alta',  status: 'cheia',  last_collected: '2025-01-10T07:30:00', zone: 'Moema'        },
+  { id: 3,  name: 'Av. Paulista',           location: 'Av. Paulista, 1000',                     latitude: -23.5631, longitude: -46.6544, level: 81, priority: 'alta',  status: 'ativa',  last_collected: '2025-01-09T16:00:00', zone: 'Bela Vista'   },
+  { id: 4,  name: 'Mercadão Municipal',     location: 'Rua da Cantareira, 306',                 latitude: -23.5418, longitude: -46.6290, level: 74, priority: 'media', status: 'ativa',  last_collected: '2025-01-10T06:00:00', zone: 'Centro'       },
+  { id: 5,  name: 'Terminal Tietê',         location: 'Av. Cruzeiro do Sul, 1800',              latitude: -23.5153, longitude: -46.6255, level: 65, priority: 'media', status: 'ativa',  last_collected: '2025-01-09T14:00:00', zone: 'Santana'      },
+  { id: 6,  name: 'Shopping Eldorado',      location: 'Av. Rebouças, 3970',                     latitude: -23.5731, longitude: -46.6964, level: 58, priority: 'media', status: 'ativa',  last_collected: '2025-01-09T12:00:00', zone: 'Pinheiros'    },
+  { id: 7,  name: 'Parque Villa-Lobos',     location: 'Av. Prof. Fonseca Rodrigues, 2001',      latitude: -23.5411, longitude: -46.7172, level: 32, priority: 'baixa', status: 'ativa',  last_collected: '2025-01-09T10:00:00', zone: 'Alto de Pinheiros' },
+  { id: 8,  name: 'Praça da Sé',           location: 'Praça da Sé, s/n',                       latitude: -23.5505, longitude: -46.6333, level: 18, priority: 'baixa', status: 'ativa',  last_collected: '2025-01-08T16:00:00', zone: 'Centro'       },
+  { id: 9,  name: 'Museu do Ipiranga',      location: 'Parque da Independência, s/n',           latitude: -23.5860, longitude: -46.6090, level: 45, priority: 'baixa', status: 'ativa',  last_collected: '2025-01-09T09:00:00', zone: 'Ipiranga'     },
+  { id: 10, name: 'Estação da Luz',         location: 'Praça da Luz, 1',                        latitude: -23.5360, longitude: -46.6340, level: 77, priority: 'media', status: 'ativa',  last_collected: '2025-01-09T08:00:00', zone: 'Luz'          },
 ];
 
 export const MOCK_TRUCKS: Truck[] = [
-  { id: 1, plate: 'ABC-1234', driver: 'Carlos Oliveira', capacity_kg: 8000, current_load_kg: 6200, current_route_id: 1, status: 'em_rota',    latitude: -22.1250, longitude: -45.9860 },
-  { id: 2, plate: 'DEF-5678', driver: 'Marcos Lima',     capacity_kg: 8000, current_load_kg: 3100, current_route_id: 2, status: 'em_rota',    latitude: -22.1380, longitude: -45.9780 },
-  { id: 3, plate: 'GHI-9012', driver: 'Paulo Santos',    capacity_kg: 6000, current_load_kg: 6000, current_route_id: null, status: 'retornando', latitude: -22.1220, longitude: -45.9910 },
+  { id: 1, plate: 'ABC-1234', driver: 'Carlos Oliveira', capacity_kg: 8000, current_load_kg: 6200, current_route_id: 1, status: 'em_rota',    latitude: -23.5558, longitude: -46.6650 },
+  { id: 2, plate: 'DEF-5678', driver: 'Marcos Lima',     capacity_kg: 8000, current_load_kg: 3100, current_route_id: 2, status: 'em_rota',    latitude: -23.5480, longitude: -46.6400 },
+  { id: 3, plate: 'GHI-9012', driver: 'Paulo Santos',    capacity_kg: 6000, current_load_kg: 6000, current_route_id: null, status: 'retornando', latitude: -23.5631, longitude: -46.6544 },
   { id: 4, plate: 'JKL-3456', driver: 'Roberto Alves',   capacity_kg: 8000, current_load_kg: 0,    current_route_id: null, status: 'aguardando' },
 ];
 
