@@ -1,3 +1,55 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ── Tema 1: Verde Escuro (padrão) ── */
+:root,
+[data-theme="dark"] {
+  --bg:          #08130D;
+  --surface:     #0d1f14;
+  --card:        #1b4332;
+  --border:      #2d6a4f;
+  --accent:      #4ade80;
+  --accent-hover:#86efac;
+  --text:        #ffffff;
+  --text-muted:  #9ca3af;
+  --danger:      #f87171;
+  --warning:     #facc15;
+  --info:        #60a5fa;
+}
+
+/* ── Tema 2: Branco e Verde (claro) ── */
+[data-theme="light"] {
+  --bg:          #f0fdf4;
+  --surface:     #ffffff;
+  --card:        #ffffff;
+  --border:      #bbf7d0;
+  --accent:      #16a34a;
+  --accent-hover:#15803d;
+  --text:        #0f172a;
+  --text-muted:  #6b7280;
+  --danger:      #dc2626;
+  --warning:     #ca8a04;
+  --info:        #2563eb;
+}
+
+/* ── Tema 3: Verde Claro Suave (eco) ── */
+[data-theme="eco"] {
+  --bg:          #ecfdf5;
+  --surface:     #d1fae5;
+  --card:        #ffffff;
+  --border:      #a7f3d0;
+  --accent:      #059669;
+  --accent-hover:#047857;
+  --text:        #064e3b;
+  --text-muted:  #6b7280;
+  --danger:      #dc2626;
+  --warning:     #b45309;
+  --info:        #1d4ed8;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
