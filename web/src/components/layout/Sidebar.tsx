@@ -4,7 +4,7 @@
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Trash2, Truck, Map,
-  BarChart3, Clock, LogOut, Leaf
+  BarChart3, Clock, Bell, LogOut, Leaf
 } from 'lucide-react';
 import { useAuthStore }  from '../../store/authStore';
 import { useThemeStore } from '../../store/themeStore';
@@ -16,6 +16,7 @@ const NAV = [
   { to: '/routes',    icon: Map,             label: 'Rotas'      },
   { to: '/analytics', icon: BarChart3,       label: 'Analytics'  },
   { to: '/shifts',    icon: Clock,           label: 'Turnos'     },
+  { to: '/alerts',    icon: Bell,            label: 'Alertas'    },
 ];
 
 export default function Sidebar() {

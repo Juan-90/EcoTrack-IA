@@ -12,6 +12,7 @@ const PAGES: Record<string, { title: string; subtitle: string }> = {
   '/routes':     { title: 'Rotas',            subtitle: 'Rotas de coleta do dia'                        },
   '/analytics':  { title: 'Analytics',        subtitle: 'Indicadores de performance e eficiência'       },
   '/shifts':     { title: 'Turnos de Coleta', subtitle: 'Configuração de horários automáticos'          },
+  '/alerts': { title: 'Alertas', subtitle: 'Central de notificações e eventos críticos' },
 };
 
 export default function AppLayout() {

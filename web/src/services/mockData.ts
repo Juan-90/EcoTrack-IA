@@ -4,6 +4,7 @@
 //  Usado enquanto o backend ainda não tem as rotas implementadas
 // ─────────────────────────────────────────────────────────
 import type { Bin, Truck, Route, DashboardStats } from '../types';
+import type { Alert, AlertSettings } from '../types';
 
 export const MOCK_BINS: Bin[] = [
   { id: 1,  name: 'Hospital das Clínicas',  location: 'Av. Dr. Enéas de Carvalho Aguiar, 255', latitude: -23.5558, longitude: -46.6706, level: 92, priority: 'alta',  status: 'cheia',  last_collected: '2025-01-10T08:00:00', zone: 'Pinheiros'   },
@@ -76,4 +77,79 @@ export const MOCK_STATS: DashboardStats = {
     { name: 'Praça Central',    level: 88, predicted_full_in_h: 1.2 },
     { name: 'Parque Municipal', level: 81, predicted_full_in_h: 1.9 },
   ],
+};
+
+export const MOCK_ALERTS: Alert[] = [
+  {
+    id: 'ALT-001', type: 'bin_full', severity: 'critica', status: 'ativa',
+    title: 'Lixeira lotada — coleta urgente',
+    description: 'Hospital das Clínicas atingiu 96% de capacidade. Coleta prioritária necessária.',
+    entity_id: 1, entity_name: 'Hospital das Clínicas',
+    created_at: new Date(Date.now() - 8 * 60000).toISOString(),
+    resolved_at: null, auto_resolve: true,
+  },
+  {
+    id: 'ALT-002', type: 'bin_full', severity: 'critica', status: 'ativa',
+    title: 'Lixeira lotada — coleta urgente',
+    description: 'Parque Ibirapuera atingiu 92% de capacidade.',
+    entity_id: 2, entity_name: 'Parque Ibirapuera',
+    created_at: new Date(Date.now() - 15 * 60000).toISOString(),
+    resolved_at: null, auto_resolve: true,
+  },
+  {
+    id: 'ALT-003', type: 'truck_stopped', severity: 'alta', status: 'ativa',
+    title: 'Caminhão parado há 25 minutos',
+    description: 'ABC-1234 (Carlos Oliveira) está sem movimentação desde 09:42. Verificar ocorrência.',
+    entity_id: 1, entity_name: 'ABC-1234',
+    created_at: new Date(Date.now() - 25 * 60000).toISOString(),
+    resolved_at: null, auto_resolve: false,
+  },
+  {
+    id: 'ALT-004', type: 'bin_offline', severity: 'alta', status: 'ativa',
+    title: 'Sensor offline — sem leitura',
+    description: 'Av. Paulista sem transmissão de dados há 2 horas. Verificar conexão do ESP32.',
+    entity_id: 3, entity_name: 'Av. Paulista',
+    created_at: new Date(Date.now() - 120 * 60000).toISOString(),
+    resolved_at: null, auto_resolve: false,
+  },
+  {
+    id: 'ALT-005', type: 'route_delayed', severity: 'media', status: 'ativa',
+    title: 'Rota com atraso',
+    description: 'Rota #2 deveria ter iniciado às 07:30. Atraso de 40 minutos.',
+    entity_id: 2, entity_name: 'Rota #2',
+    created_at: new Date(Date.now() - 40 * 60000).toISOString(),
+    resolved_at: null, auto_resolve: false,
+  },
+  {
+    id: 'ALT-006', type: 'sensor_anomaly', severity: 'media', status: 'ativa',
+    title: 'Leitura anômala do sensor',
+    description: 'Mercadão Central registrou variação de 40% em 5 minutos. Possível falha no sensor.',
+    entity_id: 4, entity_name: 'Mercadão Central',
+    created_at: new Date(Date.now() - 35 * 60000).toISOString(),
+    resolved_at: null, auto_resolve: false,
+  },
+  {
+    id: 'ALT-007', type: 'bin_full', severity: 'alta', status: 'resolvida',
+    title: 'Lixeira lotada — resolvida',
+    description: 'Terminal Tietê foi coletado e nível voltou a 12%.',
+    entity_id: 5, entity_name: 'Terminal Tietê',
+    created_at: new Date(Date.now() - 180 * 60000).toISOString(),
+    resolved_at: new Date(Date.now() - 60 * 60000).toISOString(),
+    auto_resolve: true,
+  },
+  {
+    id: 'ALT-008', type: 'truck_stopped', severity: 'alta', status: 'resolvida',
+    title: 'Caminhão parado — resolvido',
+    description: 'DEF-5678 retomou operação após pausa para abastecimento.',
+    entity_id: 2, entity_name: 'DEF-5678',
+    created_at: new Date(Date.now() - 240 * 60000).toISOString(),
+    resolved_at: new Date(Date.now() - 180 * 60000).toISOString(),
+    auto_resolve: false,
+  },
+];
+
+export const DEFAULT_ALERT_SETTINGS: AlertSettings = {
+  sound_enabled:  true,
+  visual_enabled: true,
+  min_severity:   'media',
 };

@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useThemeStore } from '../../store/themeStore';
 import { RefreshCw, Bell, Sun, Moon, Leaf } from 'lucide-react';
+import { useAlerts } from '../../hooks/useAlerts';
 
 interface HeaderProps { title: string; subtitle?: string; }
 
@@ -13,6 +14,7 @@ export default function Header({ title, subtitle }: HeaderProps) {
   const [spinning, setSpinning] = useState(false);
   const qc = useQueryClient();
   const { theme, cycleTheme } = useThemeStore();
+  const { activeCount } = useAlerts();
 
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000);
@@ -82,11 +84,20 @@ export default function Header({ title, subtitle }: HeaderProps) {
 
         {/* Notificações */}
         <button
+          onClick={() => window.location.href = '/alerts'}
           className="relative p-1.5 rounded-lg transition-all"
-          style={{ background: 'var(--card)', color: 'var(--text-muted)', border: '1px solid var(--border)' }}
+          style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
+          title="Ver alertas"
         >
-          <Bell className="w-4 h-4" />
-          <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-red-500 rounded-full" />
+          <Bell className="w-4 h-4" style={{ color: activeCount > 0 ? 'var(--danger)' : 'var(--text-muted)' }} />
+          {activeCount > 0 && (
+            <span
+              className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center"
+              style={{ background: 'var(--danger)', color: '#fff' }}
+            >
+              {activeCount > 9 ? '9+' : activeCount}
+            </span>
+          )}
         </button>
       </div>
     </header>

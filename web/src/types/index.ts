@@ -84,3 +84,34 @@ export interface LoginResponse {
   access_token: string;
   token_type: 'bearer';
 }
+
+// ── Alertas ───────────────────────────────────────────────
+export type AlertSeverity = 'critica' | 'alta' | 'media' | 'baixa';
+export type AlertType =
+  | 'bin_full'          // lixeira cheia
+  | 'bin_offline'       // sensor offline
+  | 'truck_stopped'     // caminhão parado
+  | 'route_delayed'     // rota atrasada
+  | 'sensor_anomaly';   // leitura anômala do sensor
+
+export type AlertStatus = 'ativa' | 'resolvida' | 'ignorada';
+
+export interface Alert {
+  id:          string;
+  type:        AlertType;
+  severity:    AlertSeverity;
+  status:      AlertStatus;
+  title:       string;
+  description: string;
+  entity_id:   number;        // id da lixeira, caminhão etc
+  entity_name: string;        // "Hospital", "ABC-1234" etc
+  created_at:  string;        // ISO datetime
+  resolved_at: string | null;
+  auto_resolve: boolean;      // se resolve sozinho quando nível baixar
+}
+
+export interface AlertSettings {
+  sound_enabled:  boolean;
+  visual_enabled: boolean;
+  min_severity:   AlertSeverity; // só notifica acima deste nível
+}
