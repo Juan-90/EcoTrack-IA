@@ -1,57 +1,117 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, ReactNode, useEffect, useState } from "react";
+import { api, registerUnauthorizedHandler } from "@/src/services/api";
+import {
+  getToken,
+  removeToken,
+  saveToken,
+} from "@/src/utils/tokenStorage";
 
-type User = {
-  email: string;
-};
+interface AuthContextData {
+  userToken: string | null;
+  isLoading: boolean;
+  isSigningIn: boolean;
+  isAuthenticated: boolean;
+  signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
+}
 
-type AuthContextData = {
-  user: User | null;
-  login: (email: string, password: string) => boolean;
-  logout: () => void;
-};
-
-const AuthContext = createContext<AuthContextData | undefined>(undefined);
-
-type Props = {
+interface AuthProviderProps {
   children: ReactNode;
-};
+}
 
-export function AuthProvider({ children }: Props) {
-  const [user, setUser] = useState<User | null>(null);
+export const AuthContext = createContext({} as AuthContextData);
 
-  function login(email: string, password: string) {
-    // LOGIN MOCK (temporário)
-    if (email === "admin@ecotrack.com" && password === "123456") {
-      setUser({ email });
-      return true;
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [userToken, setUserToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSigningIn, setIsSigningIn] = useState(false);
+
+  useEffect(() => {
+    async function restoreSession() {
+      try {
+        const token = await getToken();
+
+        if (token) {
+          api.defaults.headers.common.Authorization = `Bearer ${token}`;
+          setUserToken(token);
+        }
+      } catch (error) {
+        console.log("Erro ao restaurar sessão:", error);
+      } finally {
+        setIsLoading(false);
+      }
     }
 
-    return false;
+    restoreSession();
+  }, []);
+
+  useEffect(() => {
+    registerUnauthorizedHandler(async () => {
+      await signOut();
+    });
+
+    return () => {
+      registerUnauthorizedHandler(null);
+    };
+  }, []);
+
+  async function signIn(email: string, password: string) {
+    try {
+      setIsSigningIn(true);
+
+      const formData = new URLSearchParams();
+      formData.append("username", email.trim());
+      formData.append("password", password);
+
+      const response = await api.post("/login", formData.toString(), {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      });
+
+      const accessToken = response.data?.access_token;
+
+      if (!accessToken) {
+        throw new Error("Token de acesso não retornado pela API.");
+      }
+
+      await saveToken(accessToken);
+      api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+      setUserToken(accessToken);
+    } catch (error: any) {
+      console.log(
+        "Erro no login:",
+        error?.response?.data || error?.message || error
+      );
+      throw error;
+    } finally {
+      setIsSigningIn(false);
+    }
   }
 
-  function logout() {
-    setUser(null);
+  async function signOut() {
+    try {
+      await removeToken();
+    } catch (error) {
+      console.log("Erro ao remover token:", error);
+    } finally {
+      delete api.defaults.headers.common.Authorization;
+      setUserToken(null);
+    }
   }
 
   return (
     <AuthContext.Provider
       value={{
-        user,
-        login,
-        logout,
+        userToken,
+        isLoading,
+        isSigningIn,
+        isAuthenticated: Boolean(userToken),
+        signIn,
+        signOut,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error("useAuth deve ser usado dentro de AuthProvider");
-  }
-
-  return context;
 }
