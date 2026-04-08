@@ -3,11 +3,13 @@ import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthContext, AuthProvider } from "@/src/store/AuthContext";
+import { ThemeProvider, useAppTheme } from "@/src/theme/ThemeContext";
 
 function RootNavigator() {
   const router = useRouter();
   const segments = useSegments();
   const { isLoading, isAuthenticated } = useContext(AuthContext);
+  const { theme } = useAppTheme();
 
   useEffect(() => {
     if (isLoading) {
@@ -34,8 +36,13 @@ function RootNavigator() {
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#1B8A5A" />
+      <View
+        style={[
+          styles.loadingContainer,
+          { backgroundColor: theme.colors.bg },
+        ]}
+      >
+        <ActivityIndicator size="large" color={theme.colors.accent} />
       </View>
     );
   }
@@ -52,9 +59,11 @@ function RootNavigator() {
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <AuthProvider>
-        <RootNavigator />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <RootNavigator />
+        </AuthProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }
@@ -64,6 +73,5 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#F4F7F5",
   },
 });
