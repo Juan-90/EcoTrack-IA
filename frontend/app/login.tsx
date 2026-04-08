@@ -9,28 +9,44 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { AxiosError } from "axios";
 import { AuthContext } from "@/src/store/AuthContext";
+import { useAppTheme } from "@/src/theme/ThemeContext";
 
-function getErrorMessage(error: any) {
-  const status = error?.response?.status;
+type ApiErrorData = {
+  detail?: string;
+};
+
+function getErrorMessage(error: unknown) {
+  const axiosError = error as AxiosError<ApiErrorData>;
+  const status = axiosError.response?.status;
+  const detail = axiosError.response?.data?.detail;
 
   if (status === 401) {
-    return "E-mail ou senha inválidos.";
+    return typeof detail === "string"
+      ? detail
+      : "E-mail ou senha inválidos.";
   }
 
   if (status === 422) {
     return "Dados inválidos. Verifique os campos e tente novamente.";
   }
 
-  if (error?.code === "ECONNABORTED") {
+  if (axiosError.message === "Network Error") {
+    return "Não foi possível conectar à API. Verifique IP, porta, backend ativo e se o celular está na mesma rede.";
+  }
+
+  if (axiosError.code === "ECONNABORTED") {
     return "Tempo de resposta excedido. Verifique a conexão com a API.";
   }
 
-  return "Não foi possível entrar. Verifique a API e tente novamente.";
+  return detail || "Não foi possível entrar. Verifique a API e tente novamente.";
 }
 
 export default function LoginScreen() {
   const { signIn, isSigningIn } = useContext(AuthContext);
+  const { theme } = useAppTheme();
+  const { colors } = theme;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -45,56 +61,106 @@ export default function LoginScreen() {
     try {
       setErrorMessage("");
       await signIn(email, password);
-    } catch (error) {
+    } catch (error: unknown) {
+      const axiosError = error as AxiosError<ApiErrorData>;
+
+      console.log("LOGIN_ERROR", {
+        message: axiosError.message,
+        code: axiosError.code,
+        status: axiosError.response?.status,
+        data: axiosError.response?.data,
+      });
+
       setErrorMessage(getErrorMessage(error));
     }
   }
 
   return (
     <KeyboardAvoidingView
-      style={styles.screen}
+      style={[styles.screen, { backgroundColor: colors.bg }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.badge}>EcoTrack-IA Mobile</Text>
-          <Text style={styles.title}>Monitoramento inteligente de coleta</Text>
-          <Text style={styles.subtitle}>
+          <Text
+            style={[
+              styles.badge,
+              {
+                backgroundColor: colors.surface,
+                color: colors.accent,
+                borderColor: colors.border,
+              },
+            ]}
+          >
+            EcoTrack-IA Mobile
+          </Text>
+
+          <Text style={[styles.title, { color: colors.text }]}>
+            Monitoramento inteligente de coleta
+          </Text>
+
+          <Text style={[styles.subtitle, { color: colors.textMuted }]}>
             Acesse sua operação e acompanhe lixeiras, rotas e coletas em tempo real.
           </Text>
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.label}>E-mail</Text>
+        <View
+          style={[
+            styles.card,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+            },
+          ]}
+        >
+          <Text style={[styles.label, { color: colors.text }]}>E-mail</Text>
           <TextInput
             value={email}
             onChangeText={setEmail}
             placeholder="seuemail@ecotrack.com"
-            placeholderTextColor="#7A8A86"
+            placeholderTextColor={colors.textMuted}
             autoCapitalize="none"
             keyboardType="email-address"
-            style={styles.input}
+            style={[
+              styles.input,
+              {
+                color: colors.text,
+                borderColor: colors.border,
+                backgroundColor: colors.surface,
+              },
+            ]}
             editable={!isSigningIn}
           />
 
-          <Text style={styles.label}>Senha</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Senha</Text>
           <TextInput
             value={password}
             onChangeText={setPassword}
             placeholder="Digite sua senha"
-            placeholderTextColor="#7A8A86"
+            placeholderTextColor={colors.textMuted}
             secureTextEntry
-            style={styles.input}
+            style={[
+              styles.input,
+              {
+                color: colors.text,
+                borderColor: colors.border,
+                backgroundColor: colors.surface,
+              },
+            ]}
             editable={!isSigningIn}
           />
 
-          {!!errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
+          {!!errorMessage && (
+            <Text style={[styles.errorText, { color: colors.danger }]}>
+              {errorMessage}
+            </Text>
+          )}
 
           <Pressable
             style={({ pressed }) => [
               styles.button,
+              { backgroundColor: isSigningIn ? colors.textMuted : colors.accent },
               pressed && !isSigningIn ? styles.buttonPressed : null,
-              isSigningIn ? styles.buttonDisabled : null,
             ]}
             onPress={handleLogin}
             disabled={isSigningIn}
@@ -106,8 +172,8 @@ export default function LoginScreen() {
             )}
           </Pressable>
 
-          <Text style={styles.helperText}>
-            Dica: defina `EXPO_PUBLIC_API_URL` para alternar facilmente entre ambientes.
+          <Text style={[styles.helperText, { color: colors.textMuted }]}>
+            Ambiente da API controlado por `EXPO_PUBLIC_API_URL`.
           </Text>
         </View>
       </View>
@@ -118,7 +184,6 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#EEF5F0",
   },
   container: {
     flex: 1,
@@ -131,8 +196,6 @@ const styles = StyleSheet.create({
   },
   badge: {
     alignSelf: "flex-start",
-    backgroundColor: "#D9F2E3",
-    color: "#1B8A5A",
     fontSize: 12,
     fontWeight: "700",
     letterSpacing: 0.4,
@@ -140,50 +203,44 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 999,
     marginBottom: 16,
+    borderWidth: 1,
   },
   title: {
     fontSize: 30,
     lineHeight: 38,
     fontWeight: "800",
-    color: "#12372A",
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 15,
     lineHeight: 22,
-    color: "#4C635C",
   },
   card: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 24,
     padding: 20,
-    shadowColor: "#0E1A16",
-    shadowOpacity: 0.08,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 4,
+    borderWidth: 1,
+    shadowColor: "#000000",
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 3,
   },
   label: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#1D312B",
     marginBottom: 8,
   },
   input: {
     height: 52,
     borderWidth: 1,
-    borderColor: "#D7E4DD",
     borderRadius: 14,
     paddingHorizontal: 14,
     fontSize: 15,
-    color: "#10201B",
-    backgroundColor: "#FAFCFB",
     marginBottom: 16,
   },
   button: {
     height: 52,
     borderRadius: 14,
-    backgroundColor: "#1B8A5A",
     alignItems: "center",
     justifyContent: "center",
     marginTop: 8,
@@ -191,16 +248,12 @@ const styles = StyleSheet.create({
   buttonPressed: {
     opacity: 0.9,
   },
-  buttonDisabled: {
-    backgroundColor: "#7FB79B",
-  },
   buttonText: {
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "800",
   },
   errorText: {
-    color: "#C62828",
     fontSize: 13,
     marginBottom: 8,
   },
@@ -208,6 +261,5 @@ const styles = StyleSheet.create({
     marginTop: 14,
     fontSize: 12,
     lineHeight: 18,
-    color: "#70817B",
   },
 });

@@ -9,10 +9,10 @@ function RootNavigator() {
   const router = useRouter();
   const segments = useSegments();
   const { isLoading, isAuthenticated } = useContext(AuthContext);
-  const { theme } = useAppTheme();
+  const { theme, isThemeLoading } = useAppTheme();
 
   useEffect(() => {
-    if (isLoading) {
+    if (isLoading || isThemeLoading) {
       return;
     }
 
@@ -32,9 +32,9 @@ function RootNavigator() {
     if (!isAuthenticated && !inLoginScreen) {
       router.replace("/login");
     }
-  }, [isAuthenticated, isLoading, router, segments]);
+  }, [isAuthenticated, isLoading, isThemeLoading, router, segments]);
 
-  if (isLoading) {
+  if (isLoading || isThemeLoading) {
     return (
       <View
         style={[

@@ -1,149 +1,218 @@
-import React from "react"
-import { View, StyleSheet } from "react-native"
-import MapView, { Marker, Polyline } from "react-native-maps"
+import { useMemo } from "react";
+import { Dimensions, StyleSheet, Text, View } from "react-native";
+import { router } from "expo-router";
+import MapView, { Callout, Marker } from "react-native-maps";
+import { Ionicons } from "@expo/vector-icons";
+import { mockBins } from "@/src/mocks/bins";
+import { useAppTheme } from "@/src/theme/ThemeContext";
 
-type Bin = {
-  id: number
-  name: string
-  latitude: number
-  longitude: number
-  level: number
+function getMarkerColor(status: string, colors: any) {
+  if (status === "critical") return colors.danger;
+  if (status === "warning") return colors.warning;
+  if (status === "collected") return colors.info;
+  return colors.accent;
 }
 
-const bins: Bin[] = [
-  { id: 1, name: "Praça Central", latitude: -29.466, longitude: -51.961, level: 30 },
-  { id: 2, name: "Hospital", latitude: -29.468, longitude: -51.964, level: 92 },
-  { id: 3, name: "Parque Municipal", latitude: -29.470, longitude: -51.960, level: 60 },
-  { id: 4, name: "Shopping", latitude: -29.465, longitude: -51.963, level: 75 },
-  { id: 5, name: "Rodoviária", latitude: -29.469, longitude: -51.958, level: 85 }
-]
-
-// base do caminhão
-const depot = {
-  latitude: -29.467,
-  longitude: -51.962
+function getStatusLabel(status: string) {
+  if (status === "critical") return "Prioridade alta";
+  if (status === "warning") return "Atenção";
+  if (status === "collected") return "Coletada";
+  return "Normal";
 }
 
-// calcular distância simples
-function distance(a: any, b: any) {
-  return Math.sqrt(
-    Math.pow(a.latitude - b.latitude, 2) +
-    Math.pow(a.longitude - b.longitude, 2)
-  )
-}
+export default function MapaScreen() {
+  const { theme } = useAppTheme();
+  const { colors } = theme;
 
-// algoritmo de rota otimizada
-function calculateRoute(bins: Bin[]) {
+  const initialRegion = useMemo(
+    () => ({
+      latitude: -22.4215,
+      longitude: -45.4505,
+      latitudeDelta: 0.03,
+      longitudeDelta: 0.03,
+    }),
+    []
+  );
 
-  const binsToCollect = bins.filter(bin => bin.level >= 70)
-
-  let route: any[] = []
-  let current = depot
-
-  let remaining = [...binsToCollect]
-
-  while (remaining.length > 0) {
-
-    let nearest = remaining[0]
-    let nearestIndex = 0
-
-    remaining.forEach((bin, index) => {
-
-      if (distance(current, bin) < distance(current, nearest)) {
-        nearest = bin
-        nearestIndex = index
-      }
-
-    })
-
-    route.push(nearest)
-
-    current = nearest
-
-    remaining.splice(nearestIndex, 1)
-
-  }
-
-  return route
-}
-
-function getColor(level: number) {
-  if (level > 80) return "red"
-  if (level > 40) return "orange"
-  return "green"
-}
-
-export default function Mapa() {
-
-  const route = calculateRoute(bins)
-
-  const routeCoordinates = [
-    depot,
-    ...route.map(bin => ({
-      latitude: bin.latitude,
-      longitude: bin.longitude
-    }))
-  ]
+  const binsWithLocation = mockBins.filter((bin) => bin.location);
 
   return (
-
-    <View style={styles.container}>
-
+    <View style={[styles.screen, { backgroundColor: colors.bg }]}>
       <MapView
-        style={styles.map}
-        initialRegion={{
-          latitude: -29.467,
-          longitude: -51.962,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01
-        }}
+        style={StyleSheet.absoluteFill}
+        initialRegion={initialRegion}
+        customMapStyle={
+          theme.name === "dark"
+            ? [
+                { elementType: "geometry", stylers: [{ color: "#0b1510" }] },
+                { elementType: "labels.text.fill", stylers: [{ color: "#9ca3af" }] },
+                { elementType: "labels.text.stroke", stylers: [{ color: "#08130D" }] },
+                { featureType: "road", elementType: "geometry", stylers: [{ color: "#1b4332" }] },
+                { featureType: "water", elementType: "geometry", stylers: [{ color: "#0f2a1d" }] },
+                { featureType: "poi", elementType: "geometry", stylers: [{ color: "#102118" }] },
+              ]
+            : theme.name === "eco"
+            ? [
+                { elementType: "geometry", stylers: [{ color: "#ecfdf5" }] },
+                { featureType: "road", elementType: "geometry", stylers: [{ color: "#d1fae5" }] },
+                { featureType: "water", elementType: "geometry", stylers: [{ color: "#bfdbfe" }] },
+                { featureType: "poi", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
+              ]
+            : []
+        }
       >
-
-        {/* BASE DO CAMINHÃO */}
-        <Marker
-          coordinate={depot}
-          title="Base de Coleta"
-          pinColor="blue"
-        />
-
-        {/* LIXEIRAS */}
-        {bins.map((bin) => (
-
+        {binsWithLocation.map((bin) => (
           <Marker
             key={bin.id}
             coordinate={{
-              latitude: bin.latitude,
-              longitude: bin.longitude
+              latitude: bin.location!.latitude,
+              longitude: bin.location!.longitude,
             }}
-            title={bin.name}
-            description={`Nível: ${bin.level}%`}
-            pinColor={getColor(bin.level)}
-          />
-
+            pinColor={getMarkerColor(bin.status, colors)}
+          >
+            <Callout tooltip onPress={() => router.push(`/lixeira/${bin.id}`)}>
+              <View
+                style={[
+                  styles.callout,
+                  {
+                    backgroundColor: colors.card,
+                    borderColor: colors.border,
+                  },
+                ]}
+              >
+                <Text style={[styles.calloutTitle, { color: colors.text }]}>
+                  {bin.name}
+                </Text>
+                <Text style={[styles.calloutText, { color: colors.textMuted }]}>
+                  {bin.district} • {bin.level}%
+                </Text>
+                <Text
+                  style={[
+                    styles.calloutStatus,
+                    { color: getMarkerColor(bin.status, colors) },
+                  ]}
+                >
+                  Toque para abrir coleta
+                </Text>
+              </View>
+            </Callout>
+          </Marker>
         ))}
-
-        {/* ROTA OTIMIZADA */}
-        <Polyline
-          coordinates={routeCoordinates}
-          strokeWidth={4}
-          strokeColor="cyan"
-        />
-
       </MapView>
 
-    </View>
+      <View
+        style={[
+          styles.overlayCard,
+          {
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+          },
+        ]}
+      >
+        <Text style={[styles.overlayTitle, { color: colors.text }]}>
+          Mapa operacional
+        </Text>
+        <Text style={[styles.overlaySubtitle, { color: colors.textMuted }]}>
+          Toque no marcador e depois no cartão para abrir a lixeira.
+        </Text>
+      </View>
 
-  )
+      <View
+        style={[
+          styles.legendCard,
+          {
+            backgroundColor: colors.card,
+            borderColor: colors.border,
+          },
+        ]}
+      >
+        <View style={styles.legendItem}>
+          <Ionicons name="location" size={16} color={colors.danger} />
+          <Text style={[styles.legendText, { color: colors.text }]}>Crítica</Text>
+        </View>
+
+        <View style={styles.legendItem}>
+          <Ionicons name="location" size={16} color={colors.warning} />
+          <Text style={[styles.legendText, { color: colors.text }]}>Atenção</Text>
+        </View>
+
+        <View style={styles.legendItem}>
+          <Ionicons name="location" size={16} color={colors.accent} />
+          <Text style={[styles.legendText, { color: colors.text }]}>Normal</Text>
+        </View>
+      </View>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-
-  container: {
-    flex: 1
+  screen: { flex: 1 },
+  overlayCard: {
+    position: "absolute",
+    top: 16,
+    left: 16,
+    right: 16,
+    borderRadius: 20,
+    padding: 16,
+    borderWidth: 1,
+    shadowColor: "#000000",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
   },
-
-  map: {
-    flex: 1
-  }
-
-})
+  overlayTitle: {
+    fontSize: 18,
+    fontWeight: "800",
+    marginBottom: 4,
+  },
+  overlaySubtitle: {
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  legendCard: {
+    position: "absolute",
+    bottom: 24,
+    left: 16,
+    right: 16,
+    borderRadius: 18,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderWidth: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    shadowColor: "#000000",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+  },
+  legendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  legendText: {
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  callout: {
+    minWidth: Math.min(Dimensions.get("window").width * 0.65, 240),
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 12,
+  },
+  calloutTitle: {
+    fontSize: 14,
+    fontWeight: "800",
+    marginBottom: 4,
+  },
+  calloutText: {
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  calloutStatus: {
+    fontSize: 12,
+    fontWeight: "800",
+  },
+});

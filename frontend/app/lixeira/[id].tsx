@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -14,6 +13,7 @@ import {
   markBinAsCollected,
 } from "@/src/services/binService";
 import { Bin } from "@/src/types/bin";
+import { useAppTheme } from "@/src/theme/ThemeContext";
 
 function getStatusLabel(status: Bin["status"]) {
   if (status === "critical") return "Prioridade alta";
@@ -22,18 +22,25 @@ function getStatusLabel(status: Bin["status"]) {
   return "Normal";
 }
 
-function getStatusColor(status: Bin["status"]) {
-  if (status === "critical") return "#D32F2F";
-  if (status === "warning") return "#F57C00";
-  if (status === "collected") return "#1B8A5A";
-  return "#2E7D32";
+function getStatusColor(status: Bin["status"], colors: any) {
+  if (status === "critical") return colors.danger;
+  if (status === "warning") return colors.warning;
+  if (status === "collected") return colors.accent;
+  return colors.accentHover;
 }
 
 export default function BinDetailsScreen() {
+  const { theme } = useAppTheme();
+  const { colors } = theme;
+
   const { id } = useLocalSearchParams<{ id: string }>();
   const [bin, setBin] = useState<Bin | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
 
   const loadBin = useCallback(async () => {
     if (!id) return;
@@ -60,15 +67,19 @@ export default function BinDetailsScreen() {
 
     try {
       setIsSubmitting(true);
+      setFeedback(null);
+
       const updated = await markBinAsCollected(id);
       setBin(updated);
-
-      Alert.alert("Coleta registrada", "A lixeira foi marcada como coletada.");
-    } catch (error) {
-      Alert.alert(
-        "Erro ao registrar coleta",
-        "Não foi possível concluir a ação agora."
-      );
+      setFeedback({
+        type: "success",
+        message: "Coleta registrada com sucesso.",
+      });
+    } catch {
+      setFeedback({
+        type: "error",
+        message: "Não foi possível registrar a coleta agora.",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -76,53 +87,93 @@ export default function BinDetailsScreen() {
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#1B8A5A" />
+      <View style={[styles.loadingContainer, { backgroundColor: colors.bg }]}>
+        <ActivityIndicator size="large" color={colors.accent} />
       </View>
     );
   }
 
   if (!bin) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.notFoundTitle}>Lixeira não encontrada</Text>
-        <Pressable style={styles.backButton} onPress={() => router.back()}>
+      <View style={[styles.loadingContainer, { backgroundColor: colors.bg }]}>
+        <Text style={[styles.notFoundTitle, { color: colors.text }]}>
+          Lixeira não encontrada
+        </Text>
+        <Pressable
+          style={[styles.backButton, { backgroundColor: colors.accent }]}
+          onPress={() => router.back()}
+        >
           <Text style={styles.backButtonText}>Voltar</Text>
         </Pressable>
       </View>
     );
   }
 
-  return (
-    <ScrollView style={styles.screen} contentContainerStyle={styles.content}>
-      <View style={styles.hero}>
-        <Text style={styles.title}>{bin.name}</Text>
-        <Text style={styles.subtitle}>{bin.district}</Text>
+  const statusColor = getStatusColor(bin.status, colors);
 
-        <View
-          style={[
-            styles.statusBadge,
-            { backgroundColor: getStatusColor(bin.status) },
-          ]}
-        >
+  return (
+    <ScrollView
+      style={[styles.screen, { backgroundColor: colors.bg }]}
+      contentContainerStyle={styles.content}
+    >
+      <View style={styles.hero}>
+        <Text style={[styles.title, { color: colors.text }]}>{bin.name}</Text>
+        <Text style={[styles.subtitle, { color: colors.textMuted }]}>
+          {bin.district}
+        </Text>
+
+        <View style={[styles.statusBadge, { backgroundColor: statusColor }]}>
           <Text style={styles.statusBadgeText}>{getStatusLabel(bin.status)}</Text>
         </View>
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.sectionTitle}>Informações da coleta</Text>
-        <Text style={styles.infoLine}>Nível atual: {bin.level}%</Text>
-        <Text style={styles.infoLine}>
+      {feedback ? (
+        <View
+          style={[
+            styles.feedbackCard,
+            {
+              backgroundColor: colors.card,
+              borderColor:
+                feedback.type === "success" ? colors.accent : colors.danger,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.feedbackText,
+              {
+                color:
+                  feedback.type === "success" ? colors.accent : colors.danger,
+              },
+            ]}
+          >
+            {feedback.message}
+          </Text>
+        </View>
+      ) : null}
+
+      <View
+        style={[
+          styles.card,
+          { backgroundColor: colors.card, borderColor: colors.border },
+        ]}
+      >
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          Informações da coleta
+        </Text>
+        <Text style={[styles.infoLine, { color: colors.textMuted }]}>
+          Nível atual: {bin.level}%
+        </Text>
+        <Text style={[styles.infoLine, { color: colors.textMuted }]}>
           Rota: {bin.routeName || "Rota do dia"}
         </Text>
-        <Text style={styles.infoLine}>
+        <Text style={[styles.infoLine, { color: colors.textMuted }]}>
           Endereço: {bin.address || "Não informado"}
         </Text>
-        <Text style={styles.infoLine}>
-          Última atualização:{" "}
-          {new Date(bin.updatedAt).toLocaleString("pt-BR")}
+        <Text style={[styles.infoLine, { color: colors.textMuted }]}>
+          Última atualização: {new Date(bin.updatedAt).toLocaleString("pt-BR")}
         </Text>
-        <Text style={styles.infoLine}>
+        <Text style={[styles.infoLine, { color: colors.textMuted }]}>
           Última coleta:{" "}
           {bin.lastCollection
             ? new Date(bin.lastCollection).toLocaleString("pt-BR")
@@ -130,18 +181,13 @@ export default function BinDetailsScreen() {
         </Text>
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.sectionTitle}>Orientação operacional</Text>
-        <Text style={styles.helperText}>
-          Priorize esta lixeira se ela estiver no caminho da rota atual ou com
-          risco de transbordo.
-        </Text>
-      </View>
-
       <Pressable
         style={[
           styles.collectButton,
-          bin.status === "collected" ? styles.collectButtonDone : null,
+          {
+            backgroundColor:
+              bin.status === "collected" ? colors.textMuted : colors.accent,
+          },
         ]}
         onPress={handleCollect}
         disabled={isSubmitting || bin.status === "collected"}
@@ -159,33 +205,22 @@ export default function BinDetailsScreen() {
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: "#F3F7F4",
-  },
-  content: {
-    padding: 20,
-    paddingBottom: 32,
-  },
+  screen: { flex: 1 },
+  content: { padding: 20, paddingBottom: 32 },
   loadingContainer: {
     flex: 1,
-    backgroundColor: "#F3F7F4",
     alignItems: "center",
     justifyContent: "center",
     padding: 24,
   },
-  hero: {
-    marginBottom: 18,
-  },
+  hero: { marginBottom: 18 },
   title: {
     fontSize: 28,
     fontWeight: "800",
-    color: "#10251D",
     marginBottom: 6,
   },
   subtitle: {
     fontSize: 15,
-    color: "#60716A",
     marginBottom: 12,
   },
   statusBadge: {
@@ -199,40 +234,39 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "700",
   },
+  feedbackCard: {
+    borderWidth: 1,
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 12,
+  },
+  feedbackText: {
+    fontSize: 14,
+    fontWeight: "700",
+  },
   card: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 20,
     padding: 18,
     marginBottom: 12,
+    borderWidth: 1,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: "800",
-    color: "#193029",
     marginBottom: 12,
   },
   infoLine: {
     fontSize: 14,
     lineHeight: 21,
-    color: "#455751",
     marginBottom: 8,
   },
-  helperText: {
-    fontSize: 14,
-    lineHeight: 22,
-    color: "#566862",
-  },
   collectButton: {
-    backgroundColor: "#1B8A5A",
     borderRadius: 16,
     minHeight: 54,
     alignItems: "center",
     justifyContent: "center",
     marginTop: 8,
     paddingHorizontal: 16,
-  },
-  collectButtonDone: {
-    backgroundColor: "#6E8E80",
   },
   collectButtonText: {
     color: "#FFFFFF",
@@ -242,11 +276,9 @@ const styles = StyleSheet.create({
   notFoundTitle: {
     fontSize: 18,
     fontWeight: "700",
-    color: "#1A2A24",
     marginBottom: 12,
   },
   backButton: {
-    backgroundColor: "#1B8A5A",
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,

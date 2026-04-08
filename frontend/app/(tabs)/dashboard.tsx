@@ -1,14 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Pressable,
   RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+import { router } from "expo-router";
 import { getBins } from "@/src/services/binService";
 import { Bin } from "@/src/types/bin";
+import { useAppTheme } from "@/src/theme/ThemeContext";
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -19,6 +22,9 @@ function getGreeting() {
 }
 
 export default function Dashboard() {
+  const { theme } = useAppTheme();
+  const { colors } = theme;
+
   const [bins, setBins] = useState<Bin[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -55,65 +61,125 @@ export default function Dashboard() {
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#1B8A5A" />
+      <View style={[styles.loadingContainer, { backgroundColor: colors.bg }]}>
+        <ActivityIndicator size="large" color={colors.accent} />
       </View>
     );
   }
 
   return (
     <ScrollView
-      style={styles.screen}
+      style={[styles.screen, { backgroundColor: colors.bg }]}
       contentContainerStyle={styles.content}
       refreshControl={
-        <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
+        <RefreshControl
+          refreshing={isRefreshing}
+          onRefresh={handleRefresh}
+          colors={[colors.accent]}
+          progressBackgroundColor={colors.card}
+          tintColor={colors.accent}
+        />
       }
     >
       <View style={styles.hero}>
-        <Text style={styles.greeting}>{getGreeting()}</Text>
-        <Text style={styles.title}>Operação de coleta</Text>
-        <Text style={styles.subtitle}>
+        <Text style={[styles.greeting, { color: colors.accent }]}>
+          {getGreeting()}
+        </Text>
+        <Text style={[styles.title, { color: colors.text }]}>
+          Operação de coleta
+        </Text>
+        <Text style={[styles.subtitle, { color: colors.textMuted }]}>
           Acompanhe apenas o que importa para o turno de hoje.
         </Text>
       </View>
 
       <View style={styles.cardRow}>
-        <View style={[styles.metricCard, styles.metricCritical]}>
-          <Text style={styles.metricLabel}>Críticas</Text>
-          <Text style={styles.metricValue}>{criticalBins}</Text>
-          <Text style={styles.metricDescription}>Coleta imediata</Text>
+        <View
+          style={[
+            styles.metricCard,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          <Text style={[styles.metricLabel, { color: colors.textMuted }]}>
+            Críticas
+          </Text>
+          <Text style={[styles.metricValue, { color: colors.danger }]}>
+            {criticalBins}
+          </Text>
+          <Text style={[styles.metricDescription, { color: colors.textMuted }]}>
+            Coleta imediata
+          </Text>
         </View>
 
-        <View style={[styles.metricCard, styles.metricWarning]}>
-          <Text style={styles.metricLabel}>Atenção</Text>
-          <Text style={styles.metricValue}>{warningBins}</Text>
-          <Text style={styles.metricDescription}>Monitorar rota</Text>
+        <View
+          style={[
+            styles.metricCard,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          <Text style={[styles.metricLabel, { color: colors.textMuted }]}>
+            Atenção
+          </Text>
+          <Text style={[styles.metricValue, { color: colors.warning }]}>
+            {warningBins}
+          </Text>
+          <Text style={[styles.metricDescription, { color: colors.textMuted }]}>
+            Monitorar rota
+          </Text>
         </View>
       </View>
 
-      <View style={styles.metricCardWide}>
-        <Text style={styles.metricLabel}>Coletas concluídas</Text>
-        <Text style={styles.metricValueWide}>{collectedBins}</Text>
-        <Text style={styles.metricDescription}>
+      <View
+        style={[
+          styles.metricCardWide,
+          { backgroundColor: colors.card, borderColor: colors.border },
+        ]}
+      >
+        <Text style={[styles.metricLabel, { color: colors.textMuted }]}>
+          Coletas concluídas
+        </Text>
+        <Text style={[styles.metricValueWide, { color: colors.accent }]}>
+          {collectedBins}
+        </Text>
+        <Text style={[styles.metricDescription, { color: colors.textMuted }]}>
           Lixeiras marcadas como coletadas no app
         </Text>
       </View>
 
-      <View style={styles.nextCard}>
-        <Text style={styles.sectionTitle}>Próxima prioridade</Text>
+      <View
+        style={[
+          styles.nextCard,
+          { backgroundColor: colors.surface, borderColor: colors.border },
+        ]}
+      >
+        <Text style={[styles.sectionTitle, { color: colors.accent }]}>
+          Próxima prioridade
+        </Text>
 
         {nextPriority ? (
           <>
-            <Text style={styles.nextName}>{nextPriority.name}</Text>
-            <Text style={styles.nextMeta}>
+            <Text style={[styles.nextName, { color: colors.text }]}>
+              {nextPriority.name}
+            </Text>
+            <Text style={[styles.nextMeta, { color: colors.textMuted }]}>
               {nextPriority.district} • {nextPriority.level}%
             </Text>
-            <Text style={styles.nextRoute}>
+            <Text style={[styles.nextRoute, { color: colors.info }]}>
               {nextPriority.routeName || "Rota do dia"}
             </Text>
+
+            <Pressable
+              style={[
+                styles.ctaButton,
+                { backgroundColor: colors.accent },
+              ]}
+              onPress={() => router.push(`/lixeira/${nextPriority.id}`)}
+            >
+              <Text style={styles.ctaButtonText}>Abrir próxima coleta</Text>
+            </Pressable>
           </>
         ) : (
-          <Text style={styles.emptyText}>
+          <Text style={[styles.emptyText, { color: colors.textMuted }]}>
             Nenhuma lixeira prioritária no momento.
           </Text>
         )}
@@ -123,39 +189,27 @@ export default function Dashboard() {
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: "#F3F7F4",
-  },
-  content: {
-    padding: 20,
-    paddingBottom: 32,
-  },
+  screen: { flex: 1 },
+  content: { padding: 20, paddingBottom: 32 },
   loadingContainer: {
     flex: 1,
-    backgroundColor: "#F3F7F4",
     alignItems: "center",
     justifyContent: "center",
   },
-  hero: {
-    marginBottom: 20,
-  },
+  hero: { marginBottom: 20 },
   greeting: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#1B8A5A",
     marginBottom: 6,
   },
   title: {
     fontSize: 28,
     fontWeight: "800",
-    color: "#10251D",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 15,
     lineHeight: 22,
-    color: "#5B6B65",
   },
   cardRow: {
     flexDirection: "row",
@@ -166,69 +220,68 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 20,
     padding: 18,
-  },
-  metricCritical: {
-    backgroundColor: "#FDECEC",
-  },
-  metricWarning: {
-    backgroundColor: "#FFF3E2",
+    borderWidth: 1,
   },
   metricCardWide: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 20,
     padding: 18,
     marginBottom: 12,
+    borderWidth: 1,
   },
   metricLabel: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#33423C",
     marginBottom: 10,
   },
   metricValue: {
     fontSize: 30,
     fontWeight: "800",
-    color: "#10251D",
   },
   metricValueWide: {
     fontSize: 34,
     fontWeight: "800",
-    color: "#1B8A5A",
   },
   metricDescription: {
     marginTop: 6,
     fontSize: 13,
-    color: "#66756F",
   },
   nextCard: {
-    backgroundColor: "#0F3D2E",
     borderRadius: 24,
     padding: 20,
     marginTop: 4,
+    borderWidth: 1,
   },
   sectionTitle: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#9FD9BE",
     marginBottom: 10,
   },
   nextName: {
     fontSize: 22,
     fontWeight: "800",
-    color: "#FFFFFF",
     marginBottom: 6,
   },
   nextMeta: {
     fontSize: 15,
-    color: "#E1F2E8",
     marginBottom: 4,
   },
   nextRoute: {
     fontSize: 14,
-    color: "#BDE7CF",
+    marginBottom: 16,
   },
   emptyText: {
     fontSize: 14,
-    color: "#D7EADF",
+  },
+  ctaButton: {
+    minHeight: 50,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 16,
+  },
+  ctaButtonText: {
+    color: "#FFFFFF",
+    fontSize: 15,
+    fontWeight: "800",
   },
 });
