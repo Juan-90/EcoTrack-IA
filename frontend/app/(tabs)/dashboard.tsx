@@ -1,225 +1,234 @@
-import React from "react"
-import { View, Text, StyleSheet, ScrollView, Dimensions } from "react-native"
-import { LineChart, BarChart } from "react-native-chart-kit"
-import { ChartData } from "react-native-chart-kit/dist/HelperTypes"
+import { useCallback, useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { getBins } from "@/src/services/binService";
+import { Bin } from "@/src/types/bin";
 
-const screenWidth = Dimensions.get("window").width
+function getGreeting() {
+  const hour = new Date().getHours();
 
-// Dados simulados de coletas semanais
-const coletaData: ChartData = {
-  labels: ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"],
-  datasets: [
-    {
-      data: [12, 19, 10, 15, 20, 14, 9]
-    }
-  ]
-}
-
-// Dados simulados de nível médio das lixeiras
-const nivelData = {
-  labels: ["08h", "10h", "12h", "14h", "16h", "18h"],
-  datasets: [
-    {
-      data: [20, 35, 50, 65, 70, 90]
-    }
-  ]
-}
-
-// Ranking de lixeiras críticas
-const criticalBins = [
-  { name: "Hospital", level: 92 },
-  { name: "Praça Central", level: 88 },
-  { name: "Parque Municipal", level: 81 }
-]
-
-// Simulação simples de previsão de enchimento (IA futura)
-function predictFillTime(level: number) {
-  const remaining = 100 - level
-  const ratePerHour = 10
-  const hours = remaining / ratePerHour
-
-  return `${hours.toFixed(1)}h`
+  if (hour < 12) return "Bom dia";
+  if (hour < 18) return "Boa tarde";
+  return "Boa noite";
 }
 
 export default function Dashboard() {
+  const [bins, setBins] = useState<Bin[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const loadData = useCallback(async () => {
+    const data = await getBins();
+    setBins(data);
+  }, []);
+
+  useEffect(() => {
+    async function init() {
+      try {
+        await loadData();
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    init();
+  }, [loadData]);
+
+  async function handleRefresh() {
+    setIsRefreshing(true);
+    await loadData();
+    setIsRefreshing(false);
+  }
+
+  const criticalBins = bins.filter((bin) => bin.status === "critical").length;
+  const warningBins = bins.filter((bin) => bin.status === "warning").length;
+  const collectedBins = bins.filter((bin) => bin.status === "collected").length;
+  const nextPriority = bins.find(
+    (bin) => bin.status === "critical" || bin.status === "warning"
+  );
+
+  if (isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#1B8A5A" />
+      </View>
+    );
+  }
+
   return (
-    <ScrollView style={styles.container}>
-
-      <Text style={styles.title}>EcoTrack IA</Text>
-      <Text style={styles.subtitle}>Dashboard de Monitoramento</Text>
-
-      {/* CARDS DE MÉTRICAS */}
-      <View style={styles.cardsContainer}>
-
-        <View style={styles.card}>
-          <Text style={styles.cardNumber}>42</Text>
-          <Text style={styles.cardLabel}>Lixeiras Monitoradas</Text>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.cardNumber}>8</Text>
-          <Text style={styles.cardLabel}>Lixeiras Cheias</Text>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.cardNumber}>17</Text>
-          <Text style={styles.cardLabel}>Coletas Hoje</Text>
-        </View>
-
-        <View style={styles.card}>
-          <Text style={styles.cardNumber}>91%</Text>
-          <Text style={styles.cardLabel}>Eficiência</Text>
-        </View>
-
-      </View>
-
-      {/* GRÁFICO DE NÍVEL MÉDIO */}
-      <Text style={styles.chartTitle}>Nível Médio das Lixeiras</Text>
-
-      <LineChart
-        data={nivelData}
-        width={screenWidth - 32}
-        height={220}
-        yAxisSuffix="%"
-        chartConfig={{
-          backgroundColor: "#1e2923",
-          backgroundGradientFrom: "#08130D",
-          backgroundGradientTo: "#1b4332",
-          decimalPlaces: 0,
-          color: (opacity = 1) => `rgba(255,255,255,${opacity})`,
-          labelColor: () => "#fff",
-          propsForBackgroundLines: {
-            stroke: "#2d6a4f"
-          }
-        }}
-        style={styles.chart}
-      />
-
-      {/* GRÁFICO DE COLETAS SEMANAIS */}
-      <Text style={styles.chartTitle}>Coletas na Semana</Text>
-
-      <BarChart
-        data={coletaData}
-        width={screenWidth - 32}
-        height={220}
-        fromZero
-        yAxisLabel=""
-        yAxisSuffix=""
-        chartConfig={{
-          backgroundGradientFrom: "#08130D",
-          backgroundGradientTo: "#1b4332",
-          decimalPlaces: 0,
-          color: (opacity = 1) => `rgba(255,255,255,${opacity})`,
-          labelColor: () => "#fff",
-          propsForBackgroundLines: {
-            stroke: "#2d6a4f"
-          }
-        }}
-        style={styles.chart}
-      />
-
-      {/* PREVISÃO DE ENCHIMENTO */}
-      <Text style={styles.chartTitle}>Previsão de Enchimento</Text>
-
-      <View style={styles.predictionCard}>
-        <Text style={styles.predictionText}>
-          📍 Praça Central ficará cheia em ~{predictFillTime(70)}
+    <ScrollView
+      style={styles.screen}
+      contentContainerStyle={styles.content}
+      refreshControl={
+        <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
+      }
+    >
+      <View style={styles.hero}>
+        <Text style={styles.greeting}>{getGreeting()}</Text>
+        <Text style={styles.title}>Operação de coleta</Text>
+        <Text style={styles.subtitle}>
+          Acompanhe apenas o que importa para o turno de hoje.
         </Text>
       </View>
 
-      <View style={styles.predictionCard}>
-        <Text style={styles.predictionText}>
-          📍 Parque Municipal ficará cheio em ~{predictFillTime(60)}
+      <View style={styles.cardRow}>
+        <View style={[styles.metricCard, styles.metricCritical]}>
+          <Text style={styles.metricLabel}>Críticas</Text>
+          <Text style={styles.metricValue}>{criticalBins}</Text>
+          <Text style={styles.metricDescription}>Coleta imediata</Text>
+        </View>
+
+        <View style={[styles.metricCard, styles.metricWarning]}>
+          <Text style={styles.metricLabel}>Atenção</Text>
+          <Text style={styles.metricValue}>{warningBins}</Text>
+          <Text style={styles.metricDescription}>Monitorar rota</Text>
+        </View>
+      </View>
+
+      <View style={styles.metricCardWide}>
+        <Text style={styles.metricLabel}>Coletas concluídas</Text>
+        <Text style={styles.metricValueWide}>{collectedBins}</Text>
+        <Text style={styles.metricDescription}>
+          Lixeiras marcadas como coletadas no app
         </Text>
       </View>
 
-      <View style={styles.predictionCard}>
-        <Text style={styles.predictionText}>
-          📍 Hospital ficará cheio em ~{predictFillTime(85)}
-        </Text>
-      </View>
+      <View style={styles.nextCard}>
+        <Text style={styles.sectionTitle}>Próxima prioridade</Text>
 
-      {/* RANKING DE LIXEIRAS CRÍTICAS */}
-      <Text style={styles.chartTitle}>Lixeiras Críticas</Text>
-
-      {criticalBins.map((bin, index) => (
-        <View key={index} style={styles.predictionCard}>
-          <Text style={styles.predictionText}>
-            {index + 1}️⃣ {bin.name} → {bin.level}%
+        {nextPriority ? (
+          <>
+            <Text style={styles.nextName}>{nextPriority.name}</Text>
+            <Text style={styles.nextMeta}>
+              {nextPriority.district} • {nextPriority.level}%
+            </Text>
+            <Text style={styles.nextRoute}>
+              {nextPriority.routeName || "Rota do dia"}
+            </Text>
+          </>
+        ) : (
+          <Text style={styles.emptyText}>
+            Nenhuma lixeira prioritária no momento.
           </Text>
-        </View>
-      ))}
-
+        )}
+      </View>
     </ScrollView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
-
-  container: {
+  screen: {
     flex: 1,
-    backgroundColor: "#08130D",
-    padding: 16
+    backgroundColor: "#F3F7F4",
   },
-
+  content: {
+    padding: 20,
+    paddingBottom: 32,
+  },
+  loadingContainer: {
+    flex: 1,
+    backgroundColor: "#F3F7F4",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  hero: {
+    marginBottom: 20,
+  },
+  greeting: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#1B8A5A",
+    marginBottom: 6,
+  },
   title: {
     fontSize: 28,
-    fontWeight: "bold",
-    color: "#fff"
+    fontWeight: "800",
+    color: "#10251D",
+    marginBottom: 8,
   },
-
   subtitle: {
-    fontSize: 16,
-    color: "#aaa",
-    marginBottom: 20
+    fontSize: 15,
+    lineHeight: 22,
+    color: "#5B6B65",
   },
-
-  cardsContainer: {
+  cardRow: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between"
+    gap: 12,
+    marginBottom: 12,
   },
-
-  card: {
-    backgroundColor: "#1b4332",
-    width: "48%",
-    padding: 16,
-    borderRadius: 14,
-    marginBottom: 12
+  metricCard: {
+    flex: 1,
+    borderRadius: 20,
+    padding: 18,
   },
-
-  cardNumber: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#fff"
+  metricCritical: {
+    backgroundColor: "#FDECEC",
   },
-
-  cardLabel: {
-    color: "#ccc",
-    marginTop: 4
+  metricWarning: {
+    backgroundColor: "#FFF3E2",
   },
-
-  chartTitle: {
-    color: "#fff",
-    fontSize: 18,
-    marginTop: 20,
-    marginBottom: 10
+  metricCardWide: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
+    padding: 18,
+    marginBottom: 12,
   },
-
-  chart: {
-    borderRadius: 16
+  metricLabel: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#33423C",
+    marginBottom: 10,
   },
-
-  predictionCard: {
-    backgroundColor: "#1b4332",
-    padding: 14,
-    borderRadius: 12,
-    marginBottom: 10
+  metricValue: {
+    fontSize: 30,
+    fontWeight: "800",
+    color: "#10251D",
   },
-
-  predictionText: {
-    color: "#fff",
-    fontSize: 14
-  }
-
-})
+  metricValueWide: {
+    fontSize: 34,
+    fontWeight: "800",
+    color: "#1B8A5A",
+  },
+  metricDescription: {
+    marginTop: 6,
+    fontSize: 13,
+    color: "#66756F",
+  },
+  nextCard: {
+    backgroundColor: "#0F3D2E",
+    borderRadius: 24,
+    padding: 20,
+    marginTop: 4,
+  },
+  sectionTitle: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: "#9FD9BE",
+    marginBottom: 10,
+  },
+  nextName: {
+    fontSize: 22,
+    fontWeight: "800",
+    color: "#FFFFFF",
+    marginBottom: 6,
+  },
+  nextMeta: {
+    fontSize: 15,
+    color: "#E1F2E8",
+    marginBottom: 4,
+  },
+  nextRoute: {
+    fontSize: 14,
+    color: "#BDE7CF",
+  },
+  emptyText: {
+    fontSize: 14,
+    color: "#D7EADF",
+  },
+});
