@@ -115,3 +115,33 @@ export interface AlertSettings {
   visual_enabled: boolean;
   min_severity:   AlertSeverity; // só notifica acima deste nível
 }
+
+// ── Coletores / Motoristas ────────────────────────────────
+export type DriverStatus = 'ativo' | 'em_rota' | 'folga' | 'afastado';
+export type CNHCategory  = 'A' | 'B' | 'C' | 'D' | 'E' | 'AB' | 'AC';
+
+export interface Driver {
+  id:           number;
+  name:         string;
+  photo?:       string;        // URL da foto
+  cnh:          string;        // número da CNH
+  cnh_category: CNHCategory;
+  cnh_expiry:   string;        // ISO date
+  phone:        string;
+  address:      string;
+  zone:         string;        // zona de atuação
+  status:       DriverStatus;
+  truck_id:     number | null;
+  hired_at:     string;        // ISO date — data de admissão
+}
+
+export interface DriverMetrics {
+  driver_id:          number;
+  collections_today:  number;
+  collections_month:  number;
+  km_today:           number;
+  km_month:           number;
+  avg_collection_min: number;  // tempo médio por coleta em minutos
+  efficiency_pct:     number;  // % de metas atingidas
+  on_time_pct:        number;  // % de rotas no prazo
+}

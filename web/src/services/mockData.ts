@@ -5,6 +5,7 @@
 // ─────────────────────────────────────────────────────────
 import type { Bin, Truck, Route, DashboardStats } from '../types';
 import type { Alert, AlertSettings } from '../types';
+import type { Driver, DriverMetrics } from '../types';
 
 export const MOCK_BINS: Bin[] = [
   { id: 1,  name: 'Hospital das Clínicas',  location: 'Av. Dr. Enéas de Carvalho Aguiar, 255', latitude: -23.5558, longitude: -46.6706, level: 92, priority: 'alta',  status: 'cheia',  last_collected: '2025-01-10T08:00:00', zone: 'Pinheiros'   },
@@ -153,3 +154,51 @@ export const DEFAULT_ALERT_SETTINGS: AlertSettings = {
   visual_enabled: true,
   min_severity:   'media',
 };
+
+export const MOCK_DRIVERS: Driver[] = [
+  {
+    id: 1, name: 'Carlos Oliveira',
+    cnh: '12345678900', cnh_category: 'D', cnh_expiry: '2026-08-15',
+    phone: '(11) 98765-4321', address: 'Rua das Flores, 123 — Vila Madalena, SP',
+    zone: 'Centro', status: 'em_rota', truck_id: 1, hired_at: '2021-03-10',
+  },
+  {
+    id: 2, name: 'Marcos Lima',
+    cnh: '98765432100', cnh_category: 'D', cnh_expiry: '2025-12-20',
+    phone: '(11) 97654-3210', address: 'Av. Paulista, 456 — Bela Vista, SP',
+    zone: 'Norte', status: 'em_rota', truck_id: 2, hired_at: '2020-07-22',
+  },
+  {
+    id: 3, name: 'Paulo Santos',
+    cnh: '45678901200', cnh_category: 'E', cnh_expiry: '2027-03-05',
+    phone: '(11) 96543-2109', address: 'Rua Augusta, 789 — Consolação, SP',
+    zone: 'Sul', status: 'ativo', truck_id: 3, hired_at: '2019-11-30',
+  },
+  {
+    id: 4, name: 'Roberto Alves',
+    cnh: '32109876500', cnh_category: 'D', cnh_expiry: '2026-05-18',
+    phone: '(11) 95432-1098', address: 'Rua Oscar Freire, 321 — Jardins, SP',
+    zone: 'Leste', status: 'afastado', truck_id: null, hired_at: '2022-01-15',
+  },
+  {
+    id: 5, name: 'Fernanda Costa',
+    cnh: '78901234500', cnh_category: 'D', cnh_expiry: '2025-09-30',
+    phone: '(11) 94321-0987', address: 'Av. Brigadeiro, 654 — Itaim Bibi, SP',
+    zone: 'Oeste', status: 'folga', truck_id: null, hired_at: '2023-04-05',
+  },
+  {
+    id: 6, name: 'Diego Ferreira',
+    cnh: '56789012300', cnh_category: 'E', cnh_expiry: '2028-01-10',
+    phone: '(11) 93210-9876', address: 'Rua da Consolação, 987 — Centro, SP',
+    zone: 'Centro', status: 'ativo', truck_id: null, hired_at: '2018-06-20',
+  },
+];
+
+export const MOCK_DRIVER_METRICS: DriverMetrics[] = [
+  { driver_id: 1, collections_today: 8,  collections_month: 142, km_today: 34, km_month: 612,  avg_collection_min: 18, efficiency_pct: 94, on_time_pct: 96 },
+  { driver_id: 2, collections_today: 6,  collections_month: 128, km_today: 22, km_month: 534,  avg_collection_min: 22, efficiency_pct: 87, on_time_pct: 91 },
+  { driver_id: 3, collections_today: 11, collections_month: 178, km_today: 48, km_month: 821,  avg_collection_min: 15, efficiency_pct: 98, on_time_pct: 99 },
+  { driver_id: 4, collections_today: 0,  collections_month: 89,  km_today: 0,  km_month: 341,  avg_collection_min: 24, efficiency_pct: 72, on_time_pct: 78 },
+  { driver_id: 5, collections_today: 0,  collections_month: 156, km_today: 0,  km_month: 698,  avg_collection_min: 19, efficiency_pct: 91, on_time_pct: 94 },
+  { driver_id: 6, collections_today: 4,  collections_month: 201, km_today: 18, km_month: 934,  avg_collection_min: 14, efficiency_pct: 99, on_time_pct: 100 },
+];

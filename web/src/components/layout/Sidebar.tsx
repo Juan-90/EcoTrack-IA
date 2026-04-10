@@ -6,22 +6,24 @@ import {
   LayoutDashboard, Trash2, Truck, Map,
   BarChart3, Clock, Bell, LogOut, Leaf
 } from 'lucide-react';
-import { useAuthStore }  from '../../store/authStore';
+import { useAuthStore } from '../../store/authStore';
 import { useThemeStore } from '../../store/themeStore';
+import { Users } from 'lucide-react';
 
 const NAV = [
-  { to: '/',          icon: LayoutDashboard, label: 'Dashboard'  },
-  { to: '/bins',      icon: Trash2,          label: 'Lixeiras'   },
-  { to: '/trucks',    icon: Truck,           label: 'Caminhões'  },
-  { to: '/routes',    icon: Map,             label: 'Rotas'      },
-  { to: '/analytics', icon: BarChart3,       label: 'Analytics'  },
-  { to: '/shifts',    icon: Clock,           label: 'Turnos'     },
-  { to: '/alerts',    icon: Bell,            label: 'Alertas'    },
+  { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/bins', icon: Trash2, label: 'Lixeiras' },
+  { to: '/trucks', icon: Truck, label: 'Caminhões' },
+  { to: '/routes', icon: Map, label: 'Rotas' },
+  { to: '/analytics', icon: BarChart3, label: 'Analytics' },
+  { to: '/shifts', icon: Clock, label: 'Turnos' },
+  { to: '/alerts', icon: Bell, label: 'Alertas' },
+  { to: '/drivers', icon: Users, label: 'Coletores' },
 ];
 
 export default function Sidebar() {
   const { user, logout } = useAuthStore();
-  const { theme }        = useThemeStore();
+  const { theme } = useThemeStore();
 
   const isDark = theme === 'dark';
 
@@ -68,15 +70,15 @@ export default function Sidebar() {
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all"
             style={({ isActive }) => isActive
               ? {
-                  background:   isDark ? 'rgba(74,222,128,0.1)'  : 'rgba(22,163,74,0.1)',
-                  color:        'var(--accent)',
-                  border:       '1px solid',
-                  borderColor:  isDark ? 'rgba(74,222,128,0.3)' : 'rgba(22,163,74,0.3)',
-                }
+                background: isDark ? 'rgba(74,222,128,0.1)' : 'rgba(22,163,74,0.1)',
+                color: 'var(--accent)',
+                border: '1px solid',
+                borderColor: isDark ? 'rgba(74,222,128,0.3)' : 'rgba(22,163,74,0.3)',
+              }
               : {
-                  color:        'var(--text-muted)',
-                  border:       '1px solid transparent',
-                }
+                color: 'var(--text-muted)',
+                border: '1px solid transparent',
+              }
             }
           >
             <Icon className="w-4 h-4 flex-shrink-0" />

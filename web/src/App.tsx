@@ -11,6 +11,7 @@ import Shifts         from './pages/Shifts';
 import Login          from './pages/Login';
 import { useAuthStore } from './store/authStore';
 import AlertsPage from './pages/Alerts';
+import DriversPage from './pages/Drivers';
 
 const qc = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 10_000 } } });
 
@@ -34,6 +35,7 @@ export default function App() {
               <Route path="analytics"   element={<Analytics  />} />
               <Route path="shifts"      element={<Shifts     />} />
               <Route path="alerts" element={<AlertsPage />} />
+              <Route path="drivers" element={<DriversPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
