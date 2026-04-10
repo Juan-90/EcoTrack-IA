@@ -85,6 +85,17 @@ export default function BinDetailsScreen() {
     }
   }
 
+  function handleOpenMap() {
+    if (!bin) {
+      return;
+    }
+
+    router.push({
+      pathname: "/(tabs)/mapa",
+      params: { binId: bin.id },
+    });
+  }
+
   if (isLoading) {
     return (
       <View style={[styles.loadingContainer, { backgroundColor: colors.bg }]}>
@@ -181,25 +192,42 @@ export default function BinDetailsScreen() {
         </Text>
       </View>
 
-      <Pressable
-        style={[
-          styles.collectButton,
-          {
-            backgroundColor:
-              bin.status === "collected" ? colors.textMuted : colors.accent,
-          },
-        ]}
-        onPress={handleCollect}
-        disabled={isSubmitting || bin.status === "collected"}
-      >
-        <Text style={styles.collectButtonText}>
-          {bin.status === "collected"
-            ? "Coleta já registrada"
-            : isSubmitting
-            ? "Registrando coleta..."
-            : "Marcar como coletada"}
-        </Text>
-      </Pressable>
+      <View style={styles.actionRow}>
+        <Pressable
+          style={[
+            styles.mapButton,
+            {
+              backgroundColor: colors.card,
+              borderColor: colors.border,
+            },
+          ]}
+          onPress={handleOpenMap}
+        >
+          <Text style={[styles.mapButtonText, { color: colors.text }]}>
+            Ver no mapa
+          </Text>
+        </Pressable>
+
+        <Pressable
+          style={[
+            styles.collectButton,
+            {
+              backgroundColor:
+                bin.status === "collected" ? colors.textMuted : colors.accent,
+            },
+          ]}
+          onPress={handleCollect}
+          disabled={isSubmitting || bin.status === "collected"}
+        >
+          <Text style={styles.collectButtonText}>
+            {bin.status === "collected"
+              ? "Coleta já registrada"
+              : isSubmitting
+              ? "Registrando..."
+              : "Marcar coleta"}
+          </Text>
+        </Pressable>
+      </View>
     </ScrollView>
   );
 }
@@ -247,7 +275,7 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 20,
     padding: 18,
-    marginBottom: 12,
+    marginBottom: 14,
     borderWidth: 1,
   },
   sectionTitle: {
@@ -260,13 +288,30 @@ const styles = StyleSheet.create({
     lineHeight: 21,
     marginBottom: 8,
   },
+  actionRow: {
+    flexDirection: "row",
+    gap: 10,
+  },
+  mapButton: {
+    flex: 1,
+    minHeight: 54,
+    borderRadius: 16,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 12,
+  },
+  mapButtonText: {
+    fontSize: 15,
+    fontWeight: "800",
+  },
   collectButton: {
+    flex: 1.2,
     borderRadius: 16,
     minHeight: 54,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 8,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
   },
   collectButtonText: {
     color: "#FFFFFF",
