@@ -130,10 +130,9 @@ Web (Administração Pública)
 
 Projeto desenvolvido no curso de **Desenvolvimento Web** do **IFSULDEMINAS** para participação em evento acadêmico / edital de Trilha Nacional de Pré-Incubação Brasil Inovador.
 
-- **Juan Andrade (Líder)** — Frontend / Mobile  
+- **Juan Andrade (Líder)** — Frontend / Mobile / Backend  
 - **Mauricio Ferreira da Silva** — Protótipo IoT  
-- **Caio Ygor de Morais Mattos** — Backend  
-- **Nelson de Oliveira Sousa** — Testes e Supervisão  
+- **Nelson de Oliveira Sousa** — Backend / Testes / Supervisão  
 - **Roberto Nunes Duarte** — Tutor / Professor  
 
 ---
