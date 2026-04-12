@@ -14,6 +14,7 @@ import AlertsPage from './pages/Alerts';
 import DriversPage from './pages/Drivers';
 import ReportsPage from './pages/Reports';
 import FleetPage from './pages/Fleet';
+import ZonesPage from './pages/Zones';
 
 const qc = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 10_000 } } });
 
@@ -40,6 +41,7 @@ export default function App() {
               <Route path="drivers" element={<DriversPage />} />
               <Route path="reports" element={<ReportsPage />} />
               <Route path="fleet" element={<FleetPage />} />
+              <Route path="zones" element={<ZonesPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

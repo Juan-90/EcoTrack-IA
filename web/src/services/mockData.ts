@@ -7,6 +7,7 @@ import type { Bin, Truck, Route, DashboardStats } from '../types';
 import type { Alert, AlertSettings } from '../types';
 import type { Driver, DriverMetrics } from '../types';
 import type { Maintenance, MaintenanceAlert } from '../types';
+import type { Zone } from '../types';
 
 export const MOCK_BINS: Bin[] = [
   { id: 1,  name: 'Hospital das Clínicas',  location: 'Av. Dr. Enéas de Carvalho Aguiar, 255', latitude: -23.5558, longitude: -46.6706, level: 92, priority: 'alta',  status: 'cheia',  last_collected: '2025-01-10T08:00:00', zone: 'Pinheiros'   },
@@ -366,5 +367,85 @@ export const MOCK_MAINTENANCE_ALERTS: MaintenanceAlert[] = [
     truck_id: 3, truck_plate: 'GHI-9012', type: 'km',
     message: 'Troca de óleo em 2.300 km',
     urgency: 'media', due_km: 75000, current_km: 72700,
+  },
+];
+
+export const MOCK_ZONES: Zone[] = [
+  {
+    id: 'centro', name: 'Centro',
+    color: '#f87171',
+    center: [-23.5505, -46.6333],
+    total_bins: 18, full_bins: 6,
+    avg_level: 78,
+    collections_week: 24, collections_month: 89,
+    avg_collection_freq_days: 1.2,
+    last_collection: new Date(Date.now() - 2 * 3600000).toISOString(),
+    critical_bins: ['Hospital das Clínicas', 'Mercadão Municipal', 'Praça da Sé'],
+  },
+  {
+    id: 'pinheiros', name: 'Pinheiros',
+    color: '#fb923c',
+    center: [-23.5631, -46.6944],
+    total_bins: 12, full_bins: 4,
+    avg_level: 71,
+    collections_week: 18, collections_month: 64,
+    avg_collection_freq_days: 1.5,
+    last_collection: new Date(Date.now() - 4 * 3600000).toISOString(),
+    critical_bins: ['Shopping Eldorado', 'Av. Paulista'],
+  },
+  {
+    id: 'santana', name: 'Santana',
+    color: '#facc15',
+    center: [-23.5153, -46.6255],
+    total_bins: 10, full_bins: 2,
+    avg_level: 58,
+    collections_week: 14, collections_month: 51,
+    avg_collection_freq_days: 2.1,
+    last_collection: new Date(Date.now() - 6 * 3600000).toISOString(),
+    critical_bins: ['Terminal Tietê'],
+  },
+  {
+    id: 'moema', name: 'Moema',
+    color: '#4ade80',
+    center: [-23.5874, -46.6576],
+    total_bins: 8, full_bins: 3,
+    avg_level: 65,
+    collections_week: 12, collections_month: 44,
+    avg_collection_freq_days: 1.8,
+    last_collection: new Date(Date.now() - 3 * 3600000).toISOString(),
+    critical_bins: ['Parque Ibirapuera'],
+  },
+  {
+    id: 'alto_pinheiros', name: 'Alto de Pinheiros',
+    color: '#60a5fa',
+    center: [-23.5411, -46.7172],
+    total_bins: 6, full_bins: 0,
+    avg_level: 28,
+    collections_week: 8, collections_month: 29,
+    avg_collection_freq_days: 3.2,
+    last_collection: new Date(Date.now() - 12 * 3600000).toISOString(),
+    critical_bins: [],
+  },
+  {
+    id: 'ipiranga', name: 'Ipiranga',
+    color: '#a78bfa',
+    center: [-23.5860, -46.6090],
+    total_bins: 7, full_bins: 1,
+    avg_level: 42,
+    collections_week: 9, collections_month: 33,
+    avg_collection_freq_days: 2.8,
+    last_collection: new Date(Date.now() - 8 * 3600000).toISOString(),
+    critical_bins: ['Museu do Ipiranga'],
+  },
+  {
+    id: 'luz', name: 'Luz',
+    color: '#f472b6',
+    center: [-23.5360, -46.6340],
+    total_bins: 9, full_bins: 2,
+    avg_level: 55,
+    collections_week: 13, collections_month: 48,
+    avg_collection_freq_days: 2.0,
+    last_collection: new Date(Date.now() - 5 * 3600000).toISOString(),
+    critical_bins: ['Estação da Luz'],
   },
 ];

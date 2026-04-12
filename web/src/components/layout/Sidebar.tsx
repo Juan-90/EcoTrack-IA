@@ -23,6 +23,7 @@ const NAV = [
   { to: '/drivers', icon: Users, label: 'Coletores' },
   { to: '/reports', icon: FileText, label: 'Relatórios' },
   { to: '/fleet', icon: Wrench, label: 'Manutenção' },
+  { to: '/zones', icon: Map, label: 'Zonas' },
 ];
 
 export default function Sidebar() {

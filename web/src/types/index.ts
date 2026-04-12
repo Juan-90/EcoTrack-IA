@@ -190,3 +190,19 @@ export interface MaintenanceAlert {
   current_km?: number;
   due_date?:   string;
 }
+
+// ── Zonas e Bairros ───────────────────────────────────────
+export interface Zone {
+  id:                string;
+  name:              string;
+  color:             string;       // cor do card/mapa
+  center:            [number, number]; // [lat, lng]
+  total_bins:        number;
+  full_bins:         number;
+  avg_level:         number;       // nível médio 0–100
+  collections_week:  number;
+  collections_month: number;
+  avg_collection_freq_days: number; // frequência média em dias
+  last_collection:   string;       // ISO date
+  critical_bins:     string[];     // nomes das lixeiras críticas
+}

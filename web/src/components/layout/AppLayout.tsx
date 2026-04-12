@@ -16,6 +16,8 @@ const PAGES: Record<string, { title: string; subtitle: string }> = {
   '/drivers': { title: 'Coletores e Motoristas', subtitle: 'Gestão das equipes de campo' },
   '/reports': { title: 'Relatórios', subtitle: 'Exportação e análise de dados operacionais' },
   '/fleet': { title: 'Manutenção de Frota', subtitle: 'Controle do ciclo de vida dos caminhões' },
+  '/zones': { title: 'Zonas e Bairros', subtitle: 'Gestão territorial da coleta urbana' },
+
 };
 
 export default function AppLayout() {
