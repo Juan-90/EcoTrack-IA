@@ -14,6 +14,8 @@ const PAGES: Record<string, { title: string; subtitle: string }> = {
   '/shifts':     { title: 'Turnos de Coleta', subtitle: 'Configuração de horários automáticos'          },
   '/alerts': { title: 'Alertas', subtitle: 'Central de notificações e eventos críticos' },
   '/drivers': { title: 'Coletores e Motoristas', subtitle: 'Gestão das equipes de campo' },
+  '/reports': { title: 'Relatórios', subtitle: 'Exportação e análise de dados operacionais' },
+  '/fleet': { title: 'Manutenção de Frota', subtitle: 'Controle do ciclo de vida dos caminhões' },
 };
 
 export default function AppLayout() {

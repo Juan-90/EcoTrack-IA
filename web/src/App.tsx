@@ -12,6 +12,8 @@ import Login          from './pages/Login';
 import { useAuthStore } from './store/authStore';
 import AlertsPage from './pages/Alerts';
 import DriversPage from './pages/Drivers';
+import ReportsPage from './pages/Reports';
+import FleetPage from './pages/Fleet';
 
 const qc = new QueryClient({ defaultOptions: { queries: { retry: 1, staleTime: 10_000 } } });
 
@@ -36,6 +38,8 @@ export default function App() {
               <Route path="shifts"      element={<Shifts     />} />
               <Route path="alerts" element={<AlertsPage />} />
               <Route path="drivers" element={<DriversPage />} />
+              <Route path="reports" element={<ReportsPage />} />
+              <Route path="fleet" element={<FleetPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

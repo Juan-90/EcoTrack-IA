@@ -145,3 +145,48 @@ export interface DriverMetrics {
   efficiency_pct:     number;  // % de metas atingidas
   on_time_pct:        number;  // % de rotas no prazo
 }
+
+// ── Manutenção de Frota ───────────────────────────────────
+export type MaintenanceType =
+  | 'preventiva'    // revisão programada
+  | 'corretiva'     // reparo após falha
+  | 'preditiva'     // baseada em dados do sensor
+  | 'emergencial';  // parada não planejada
+
+export type MaintenanceStatus = 'agendada' | 'em_andamento' | 'concluida' | 'cancelada';
+
+export interface MaintenancePart {
+  name:     string;
+  quantity: number;
+  cost_brl: number;
+}
+
+export interface Maintenance {
+  id:            number;
+  truck_id:      number;
+  truck_plate:   string;
+  type:          MaintenanceType;
+  status:        MaintenanceStatus;
+  description:   string;
+  scheduled_date:string;              // ISO date
+  completed_date:string | null;
+  km_at_service: number;
+  next_km:       number | null;       // km para próxima manutenção
+  next_date:     string | null;       // data da próxima manutenção
+  workshop:      string | null;       // nome da oficina
+  mechanic:      string | null;       // nome do mecânico
+  labor_cost_brl:number;              // mão de obra
+  parts:         MaintenancePart[];   // peças utilizadas
+  notes:         string | null;
+}
+
+export interface MaintenanceAlert {
+  truck_id:    number;
+  truck_plate: string;
+  type:        'km' | 'date';
+  message:     string;
+  urgency:     'critica' | 'alta' | 'media';
+  due_km?:     number;
+  current_km?: number;
+  due_date?:   string;
+}

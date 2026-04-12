@@ -9,6 +9,8 @@ import {
 import { useAuthStore } from '../../store/authStore';
 import { useThemeStore } from '../../store/themeStore';
 import { Users } from 'lucide-react';
+import { FileText } from 'lucide-react';
+import { Wrench } from 'lucide-react';
 
 const NAV = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -19,6 +21,8 @@ const NAV = [
   { to: '/shifts', icon: Clock, label: 'Turnos' },
   { to: '/alerts', icon: Bell, label: 'Alertas' },
   { to: '/drivers', icon: Users, label: 'Coletores' },
+  { to: '/reports', icon: FileText, label: 'Relatórios' },
+  { to: '/fleet', icon: Wrench, label: 'Manutenção' },
 ];
 
 export default function Sidebar() {

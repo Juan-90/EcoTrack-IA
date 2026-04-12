@@ -6,6 +6,7 @@
 import type { Bin, Truck, Route, DashboardStats } from '../types';
 import type { Alert, AlertSettings } from '../types';
 import type { Driver, DriverMetrics } from '../types';
+import type { Maintenance, MaintenanceAlert } from '../types';
 
 export const MOCK_BINS: Bin[] = [
   { id: 1,  name: 'Hospital das Clínicas',  location: 'Av. Dr. Enéas de Carvalho Aguiar, 255', latitude: -23.5558, longitude: -46.6706, level: 92, priority: 'alta',  status: 'cheia',  last_collected: '2025-01-10T08:00:00', zone: 'Pinheiros'   },
@@ -201,4 +202,169 @@ export const MOCK_DRIVER_METRICS: DriverMetrics[] = [
   { driver_id: 4, collections_today: 0,  collections_month: 89,  km_today: 0,  km_month: 341,  avg_collection_min: 24, efficiency_pct: 72, on_time_pct: 78 },
   { driver_id: 5, collections_today: 0,  collections_month: 156, km_today: 0,  km_month: 698,  avg_collection_min: 19, efficiency_pct: 91, on_time_pct: 94 },
   { driver_id: 6, collections_today: 4,  collections_month: 201, km_today: 18, km_month: 934,  avg_collection_min: 14, efficiency_pct: 99, on_time_pct: 100 },
+];
+
+// ── Dados para Relatórios ─────────────────────────────────
+export const MOCK_REPORT_DATA = {
+
+  // Coletas por dia (últimos 30 dias)
+  collections_daily: Array.from({ length: 30 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (29 - i));
+    return {
+      date:       date.toISOString().split('T')[0],
+      label:      date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+      total:      Math.floor(Math.random() * 20 + 15),
+      zona_centro:Math.floor(Math.random() * 6 + 4),
+      zona_norte: Math.floor(Math.random() * 5 + 3),
+      zona_sul:   Math.floor(Math.random() * 5 + 3),
+      zona_leste: Math.floor(Math.random() * 4 + 2),
+      zona_oeste: Math.floor(Math.random() * 4 + 2),
+      kg_total:   Math.floor(Math.random() * 2000 + 1500),
+    };
+  }),
+
+  // Performance por motorista (mês atual)
+  driver_performance: [
+    { name: 'Carlos Oliveira',  collections: 142, km: 612,  efficiency: 94, on_time: 96,  avg_min: 18 },
+    { name: 'Marcos Lima',      collections: 128, km: 534,  efficiency: 87, on_time: 91,  avg_min: 22 },
+    { name: 'Paulo Santos',     collections: 178, km: 821,  efficiency: 98, on_time: 99,  avg_min: 15 },
+    { name: 'Roberto Alves',    collections: 89,  km: 341,  efficiency: 72, on_time: 78,  avg_min: 24 },
+    { name: 'Fernanda Costa',   collections: 156, km: 698,  efficiency: 91, on_time: 94,  avg_min: 19 },
+    { name: 'Diego Ferreira',   collections: 201, km: 934,  efficiency: 99, on_time: 100, avg_min: 14 },
+  ],
+
+  // Eficiência das rotas (mês atual)
+  route_efficiency: [
+    { route: 'Rota #1 — Centro',   total_runs: 22, on_time: 21, avg_stops: 8,  avg_km: 12.4, completion: 98 },
+    { route: 'Rota #2 — Norte',    total_runs: 20, on_time: 18, avg_stops: 7,  avg_km: 9.8,  completion: 94 },
+    { route: 'Rota #3 — Sul',      total_runs: 21, on_time: 19, avg_stops: 9,  avg_km: 14.2, completion: 96 },
+    { route: 'Rota #4 — Leste',    total_runs: 18, on_time: 14, avg_stops: 6,  avg_km: 11.1, completion: 87 },
+    { route: 'Rota #5 — Oeste',    total_runs: 19, on_time: 17, avg_stops: 7,  avg_km: 10.6, completion: 92 },
+  ],
+
+  // KPIs gerais do mês
+  monthly_kpis: {
+    total_collections:  894,
+    total_kg:           48_230,
+    total_km:           3_940,
+    avg_efficiency:     91.2,
+    full_bins_avoided:  312,
+    cost_saved_brl:     18_400,
+  },
+};
+
+export const MOCK_MAINTENANCE: Maintenance[] = [
+  {
+    id: 1, truck_id: 1, truck_plate: 'ABC-1234',
+    type: 'preventiva', status: 'concluida',
+    description: 'Revisão geral — 50.000 km',
+    scheduled_date: '2025-01-05', completed_date: '2025-01-05',
+    km_at_service: 50000, next_km: 60000, next_date: '2025-04-05',
+    workshop: 'Auto Center Silva', mechanic: 'João Mecânico',
+    labor_cost_brl: 450,
+    parts: [
+      { name: 'Filtro de óleo',   quantity: 1, cost_brl: 35  },
+      { name: 'Óleo motor 15W40', quantity: 6, cost_brl: 180 },
+      { name: 'Filtro de ar',     quantity: 1, cost_brl: 45  },
+    ],
+    notes: 'Revisão realizada sem intercorrências.',
+  },
+  {
+    id: 2, truck_id: 1, truck_plate: 'ABC-1234',
+    type: 'corretiva', status: 'concluida',
+    description: 'Substituição de pastilhas de freio',
+    scheduled_date: '2025-02-12', completed_date: '2025-02-12',
+    km_at_service: 52300, next_km: null, next_date: null,
+    workshop: 'Freios & Cia', mechanic: 'Carlos Freios',
+    labor_cost_brl: 280,
+    parts: [
+      { name: 'Pastilha de freio dianteira', quantity: 1, cost_brl: 120 },
+      { name: 'Pastilha de freio traseira',  quantity: 1, cost_brl: 95  },
+    ],
+    notes: 'Desgaste acima do normal — verificar rodagem.',
+  },
+  {
+    id: 3, truck_id: 2, truck_plate: 'DEF-5678',
+    type: 'preventiva', status: 'concluida',
+    description: 'Troca de pneus — eixo traseiro',
+    scheduled_date: '2025-01-20', completed_date: '2025-01-20',
+    km_at_service: 48500, next_km: 68500, next_date: null,
+    workshop: 'Pneus Express', mechanic: 'Roberto Pneus',
+    labor_cost_brl: 200,
+    parts: [
+      { name: 'Pneu 275/80 R22.5', quantity: 4, cost_brl: 1800 },
+    ],
+    notes: null,
+  },
+  {
+    id: 4, truck_id: 3, truck_plate: 'GHI-9012',
+    type: 'emergencial', status: 'concluida',
+    description: 'Reparo no sistema elétrico — pane total',
+    scheduled_date: '2025-02-08', completed_date: '2025-02-09',
+    km_at_service: 71200, next_km: null, next_date: null,
+    workshop: 'Elétrica Veicular SP', mechanic: 'Marcos Elétrica',
+    labor_cost_brl: 850,
+    parts: [
+      { name: 'Alternador',    quantity: 1, cost_brl: 620 },
+      { name: 'Correia dentada',quantity: 1, cost_brl: 85 },
+    ],
+    notes: 'Veículo ficou parado 1 dia. Causa: alternador queimado.',
+  },
+  {
+    id: 5, truck_id: 4, truck_plate: 'JKL-3456',
+    type: 'corretiva', status: 'em_andamento',
+    description: 'Reparo na caixa de câmbio',
+    scheduled_date: '2025-03-01', completed_date: null,
+    km_at_service: 89300, next_km: null, next_date: null,
+    workshop: 'Transmissões SP', mechanic: 'André Câmbio',
+    labor_cost_brl: 0,
+    parts: [],
+    notes: 'Aguardando peça importada. Previsão: 7 dias.',
+  },
+  {
+    id: 6, truck_id: 1, truck_plate: 'ABC-1234',
+    type: 'preventiva', status: 'agendada',
+    description: 'Revisão geral — 60.000 km',
+    scheduled_date: '2025-04-05', completed_date: null,
+    km_at_service: 0, next_km: 60000, next_date: '2025-04-05',
+    workshop: 'Auto Center Silva', mechanic: null,
+    labor_cost_brl: 0,
+    parts: [],
+    notes: 'Agendada preventivamente.',
+  },
+  {
+    id: 7, truck_id: 2, truck_plate: 'DEF-5678',
+    type: 'preditiva', status: 'agendada',
+    description: 'Verificação do sistema de arrefecimento',
+    scheduled_date: '2025-03-15', completed_date: null,
+    km_at_service: 0, next_km: null, next_date: '2025-03-15',
+    workshop: null, mechanic: null,
+    labor_cost_brl: 0,
+    parts: [],
+    notes: 'Sensor indicou temperatura elevada em 3 ocasiões.',
+  },
+];
+
+export const MOCK_MAINTENANCE_ALERTS: MaintenanceAlert[] = [
+  {
+    truck_id: 1, truck_plate: 'ABC-1234', type: 'km',
+    message: 'Revisão dos 60.000 km em 500 km',
+    urgency: 'alta', due_km: 60000, current_km: 59500,
+  },
+  {
+    truck_id: 4, truck_plate: 'JKL-3456', type: 'date',
+    message: 'CRLV vence em 12 dias',
+    urgency: 'critica', due_date: '2025-03-20',
+  },
+  {
+    truck_id: 2, truck_plate: 'DEF-5678', type: 'date',
+    message: 'Revisão agendada para 15/03',
+    urgency: 'media', due_date: '2025-03-15',
+  },
+  {
+    truck_id: 3, truck_plate: 'GHI-9012', type: 'km',
+    message: 'Troca de óleo em 2.300 km',
+    urgency: 'media', due_km: 75000, current_km: 72700,
+  },
 ];
