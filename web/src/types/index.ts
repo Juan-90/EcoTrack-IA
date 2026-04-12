@@ -96,18 +96,16 @@ export type AlertType =
 
 export type AlertStatus = 'ativa' | 'resolvida' | 'ignorada';
 
-export interface Alert {
-  id:          string;
-  type:        AlertType;
-  severity:    AlertSeverity;
-  status:      AlertStatus;
-  title:       string;
-  description: string;
-  entity_id:   number;        // id da lixeira, caminhão etc
-  entity_name: string;        // "Hospital", "ABC-1234" etc
-  created_at:  string;        // ISO datetime
-  resolved_at: string | null;
-  auto_resolve: boolean;      // se resolve sozinho quando nível baixar
+export interface NotificationSettings {
+  bin_full_threshold:     number;
+  bin_critical_threshold: number;
+  truck_stopped_minutes:  number;
+  sound_enabled:          boolean;
+  visual_enabled:         boolean;
+  email_enabled:          boolean;
+  email_recipients:       string[];
+  sms_enabled:            boolean;
+  sms_recipients:         string[];
 }
 
 export interface AlertSettings {
@@ -205,4 +203,53 @@ export interface Zone {
   avg_collection_freq_days: number; // frequência média em dias
   last_collection:   string;       // ISO date
   critical_bins:     string[];     // nomes das lixeiras críticas
+}
+
+// ── Configurações ─────────────────────────────────────────
+export type UserRole = 'admin' | 'operador' | 'analista' | 'visualizador';
+
+export interface SystemUser {
+  id:         number;
+  name:       string;
+  email:      string;
+  role:       UserRole;
+  active:     boolean;
+  created_at: string;
+  last_login: string | null;
+}
+
+export interface OrgSettings {
+  name:        string;
+  city:        string;
+  state:       string;
+  cnpj:        string;
+  phone:       string;
+  email:       string;
+  address:     string;
+  logo_url:    string;
+}
+
+export interface AlertSettings {
+  bin_full_threshold:     number;   // % para disparar alerta
+  bin_critical_threshold: number;   // % para alerta crítico
+  truck_stopped_minutes:  number;   // minutos parado para alertar
+  sound_enabled:          boolean;
+  visual_enabled:         boolean;
+  email_enabled:          boolean;
+  email_recipients:       string[];
+  sms_enabled:            boolean;
+  sms_recipients:         string[];
+}
+
+export interface IntegrationSettings {
+  iot_api_url:     string;
+  iot_api_key:     string;
+  iot_enabled:     boolean;
+  email_smtp:      string;
+  email_port:      number;
+  email_user:      string;
+  email_password:  string;
+  sms_provider:    string;
+  sms_api_key:     string;
+  sms_from:        string;
 }

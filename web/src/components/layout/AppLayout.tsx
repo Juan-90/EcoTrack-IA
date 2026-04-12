@@ -17,7 +17,7 @@ const PAGES: Record<string, { title: string; subtitle: string }> = {
   '/reports': { title: 'Relatórios', subtitle: 'Exportação e análise de dados operacionais' },
   '/fleet': { title: 'Manutenção de Frota', subtitle: 'Controle do ciclo de vida dos caminhões' },
   '/zones': { title: 'Zonas e Bairros', subtitle: 'Gestão territorial da coleta urbana' },
-
+  '/settings': { title: 'Configurações', subtitle: 'Personalização e gerenciamento do sistema' },
 };
 
 export default function AppLayout() {
