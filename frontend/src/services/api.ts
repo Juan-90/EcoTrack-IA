@@ -1,9 +1,19 @@
 import axios, { AxiosError } from "axios";
-import { getToken, removeToken } from "@/src/utils/tokenStorage";
+import { getToken, removeSession } from "@/src/utils/tokenStorage";
 
 const DEFAULT_API_URL = "http://192.168.1.103:5000";
 
 let onUnauthorized: (() => void | Promise<void>) | null = null;
+
+export interface TenantResolveResponse {
+  exists: boolean;
+  tenant_id?: number;
+  tenant_code?: string;
+  tenant_name?: string;
+  tenant_type?: string;
+  status?: "active" | "inactive";
+  message?: string;
+}
 
 export function registerUnauthorizedHandler(
   handler: (() => void | Promise<void>) | null
@@ -33,10 +43,8 @@ api.interceptors.request.use(async (config) => {
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const status = error.response?.status;
-
-    if (status === 401) {
-      await removeToken();
+    if (error.response?.status === 401) {
+      await removeSession();
 
       if (onUnauthorized) {
         await onUnauthorized();
@@ -46,3 +54,13 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+export async function resolveTenant(
+  tenant: string
+): Promise<TenantResolveResponse> {
+  const response = await api.post<TenantResolveResponse>("/tenant/resolve", {
+    tenant,
+  });
+
+  return response.data;
+}
