@@ -1,12 +1,12 @@
 // ─────────────────────────────────────────────────────────
 //  EcoTrack-IA — API Service
-//  Backend: FastAPI na porta 5000
-//  Auth: OAuth2PasswordRequestForm (URLSearchParams)
+//  Multi-tenant: injeta X-Tenant-ID em todas as requisições
 // ─────────────────────────────────────────────────────────
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import type { Bin, Truck, Route, DashboardStats, LoginResponse } from '../types';
+import type { Bin, Truck, Route, DashboardStats, LoginResponse, Tenant } from '../types';
 import {
-  MOCK_BINS, MOCK_TRUCKS, MOCK_ROUTES, MOCK_STATS
+  MOCK_BINS, MOCK_TRUCKS, MOCK_ROUTES,
+  MOCK_STATS, MOCK_TENANTS,
 } from './mockData';
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -17,14 +17,28 @@ const api = axios.create({
   timeout: 10_000,
 });
 
+// ── Interceptor: JWT + Tenant ─────────────────────────────
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = localStorage.getItem('ecotrack_token');
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  // Injeta tenant em TODAS as requisições
+  const tenantRaw = localStorage.getItem('ecotrack-tenant');
+  if (tenantRaw) {
+    try {
+      const { state } = JSON.parse(tenantRaw);
+      if (state?.tenant?.id && config.headers) {
+        config.headers['X-Tenant-ID'] = state.tenant.id;
+      }
+    } catch { /* silencioso */ }
+  }
+
   return config;
 });
 
+// ── Interceptor: 401 ─────────────────────────────────────
 api.interceptors.response.use(
   (res) => res,
   (err: AxiosError) => {
@@ -36,8 +50,28 @@ api.interceptors.response.use(
   }
 );
 
+const delay = (ms = 400) => new Promise((r) => setTimeout(r, ms));
+
+// ── Tenant ────────────────────────────────────────────────
+export const tenantApi = {
+  validate: async (tenantId: string): Promise<Tenant> => {
+    if (USE_MOCK) {
+      await delay(600);
+      // Remove formatação do CNPJ para comparar
+      const clean = tenantId.replace(/\D/g, '');
+      const found = MOCK_TENANTS.find(
+        t => t.id.replace(/\D/g, '') === clean || t.id === tenantId
+      );
+      if (!found)  throw new Error('Tenant não encontrado');
+      if (!found.active) throw new Error('Tenant inativo');
+      return found;
+    }
+    const { data } = await api.post<Tenant>('/tenants/validate', { tenant_id: tenantId });
+    return data;
+  },
+};
+
 // ── Auth ──────────────────────────────────────────────────
-// Rota corrigida: /login (sem prefixo /auth)
 export const authApi = {
   login: async (email: string, password: string): Promise<LoginResponse> => {
     const form = new URLSearchParams();
@@ -49,8 +83,6 @@ export const authApi = {
     return data;
   },
 };
-
-const delay = (ms = 400) => new Promise((r) => setTimeout(r, ms));
 
 // ── Bins ──────────────────────────────────────────────────
 export const binsApi = {
@@ -89,7 +121,7 @@ export const routesApi = {
   },
 };
 
-// ── Dashboard Stats ───────────────────────────────────────
+// ── Stats ─────────────────────────────────────────────────
 export const statsApi = {
   get: async (): Promise<DashboardStats> => {
     if (USE_MOCK) { await delay(); return MOCK_STATS; }

@@ -4,29 +4,31 @@
 //  Usado enquanto o backend ainda não tem as rotas implementadas
 // ─────────────────────────────────────────────────────────
 import type { Bin, Truck, Route, DashboardStats } from '../types';
-import type { Alert, AlertSettings } from '../types';
+import type { Alert, NotificationSettings } from '../types';
 import type { Driver, DriverMetrics } from '../types';
 import type { Maintenance, MaintenanceAlert } from '../types';
 import type { Zone } from '../types';
+import type { Tenant } from '../types';
+
 
 export const MOCK_BINS: Bin[] = [
-  { id: 1,  name: 'Hospital das Clínicas',  location: 'Av. Dr. Enéas de Carvalho Aguiar, 255', latitude: -23.5558, longitude: -46.6706, level: 92, priority: 'alta',  status: 'cheia',  last_collected: '2025-01-10T08:00:00', zone: 'Pinheiros'   },
-  { id: 2,  name: 'Parque Ibirapuera',      location: 'Av. Pedro Álvares Cabral, s/n',          latitude: -23.5874, longitude: -46.6576, level: 88, priority: 'alta',  status: 'cheia',  last_collected: '2025-01-10T07:30:00', zone: 'Moema'        },
-  { id: 3,  name: 'Av. Paulista',           location: 'Av. Paulista, 1000',                     latitude: -23.5631, longitude: -46.6544, level: 81, priority: 'alta',  status: 'ativa',  last_collected: '2025-01-09T16:00:00', zone: 'Bela Vista'   },
-  { id: 4,  name: 'Mercadão Municipal',     location: 'Rua da Cantareira, 306',                 latitude: -23.5418, longitude: -46.6290, level: 74, priority: 'media', status: 'ativa',  last_collected: '2025-01-10T06:00:00', zone: 'Centro'       },
-  { id: 5,  name: 'Terminal Tietê',         location: 'Av. Cruzeiro do Sul, 1800',              latitude: -23.5153, longitude: -46.6255, level: 65, priority: 'media', status: 'ativa',  last_collected: '2025-01-09T14:00:00', zone: 'Santana'      },
-  { id: 6,  name: 'Shopping Eldorado',      location: 'Av. Rebouças, 3970',                     latitude: -23.5731, longitude: -46.6964, level: 58, priority: 'media', status: 'ativa',  last_collected: '2025-01-09T12:00:00', zone: 'Pinheiros'    },
-  { id: 7,  name: 'Parque Villa-Lobos',     location: 'Av. Prof. Fonseca Rodrigues, 2001',      latitude: -23.5411, longitude: -46.7172, level: 32, priority: 'baixa', status: 'ativa',  last_collected: '2025-01-09T10:00:00', zone: 'Alto de Pinheiros' },
-  { id: 8,  name: 'Praça da Sé',           location: 'Praça da Sé, s/n',                       latitude: -23.5505, longitude: -46.6333, level: 18, priority: 'baixa', status: 'ativa',  last_collected: '2025-01-08T16:00:00', zone: 'Centro'       },
-  { id: 9,  name: 'Museu do Ipiranga',      location: 'Parque da Independência, s/n',           latitude: -23.5860, longitude: -46.6090, level: 45, priority: 'baixa', status: 'ativa',  last_collected: '2025-01-09T09:00:00', zone: 'Ipiranga'     },
-  { id: 10, name: 'Estação da Luz',         location: 'Praça da Luz, 1',                        latitude: -23.5360, longitude: -46.6340, level: 77, priority: 'media', status: 'ativa',  last_collected: '2025-01-09T08:00:00', zone: 'Luz'          },
+  { id: 1, name: 'Hospital das Clínicas', location: 'Av. Dr. Enéas de Carvalho Aguiar, 255', latitude: -23.5558, longitude: -46.6706, level: 92, priority: 'alta', status: 'cheia', last_collected: '2025-01-10T08:00:00', zone: 'Pinheiros' },
+  { id: 2, name: 'Parque Ibirapuera', location: 'Av. Pedro Álvares Cabral, s/n', latitude: -23.5874, longitude: -46.6576, level: 88, priority: 'alta', status: 'cheia', last_collected: '2025-01-10T07:30:00', zone: 'Moema' },
+  { id: 3, name: 'Av. Paulista', location: 'Av. Paulista, 1000', latitude: -23.5631, longitude: -46.6544, level: 81, priority: 'alta', status: 'ativa', last_collected: '2025-01-09T16:00:00', zone: 'Bela Vista' },
+  { id: 4, name: 'Mercadão Municipal', location: 'Rua da Cantareira, 306', latitude: -23.5418, longitude: -46.6290, level: 74, priority: 'media', status: 'ativa', last_collected: '2025-01-10T06:00:00', zone: 'Centro' },
+  { id: 5, name: 'Terminal Tietê', location: 'Av. Cruzeiro do Sul, 1800', latitude: -23.5153, longitude: -46.6255, level: 65, priority: 'media', status: 'ativa', last_collected: '2025-01-09T14:00:00', zone: 'Santana' },
+  { id: 6, name: 'Shopping Eldorado', location: 'Av. Rebouças, 3970', latitude: -23.5731, longitude: -46.6964, level: 58, priority: 'media', status: 'ativa', last_collected: '2025-01-09T12:00:00', zone: 'Pinheiros' },
+  { id: 7, name: 'Parque Villa-Lobos', location: 'Av. Prof. Fonseca Rodrigues, 2001', latitude: -23.5411, longitude: -46.7172, level: 32, priority: 'baixa', status: 'ativa', last_collected: '2025-01-09T10:00:00', zone: 'Alto de Pinheiros' },
+  { id: 8, name: 'Praça da Sé', location: 'Praça da Sé, s/n', latitude: -23.5505, longitude: -46.6333, level: 18, priority: 'baixa', status: 'ativa', last_collected: '2025-01-08T16:00:00', zone: 'Centro' },
+  { id: 9, name: 'Museu do Ipiranga', location: 'Parque da Independência, s/n', latitude: -23.5860, longitude: -46.6090, level: 45, priority: 'baixa', status: 'ativa', last_collected: '2025-01-09T09:00:00', zone: 'Ipiranga' },
+  { id: 10, name: 'Estação da Luz', location: 'Praça da Luz, 1', latitude: -23.5360, longitude: -46.6340, level: 77, priority: 'media', status: 'ativa', last_collected: '2025-01-09T08:00:00', zone: 'Luz' },
 ];
 
 export const MOCK_TRUCKS: Truck[] = [
-  { id: 1, plate: 'ABC-1234', driver: 'Carlos Oliveira', capacity_kg: 8000, current_load_kg: 6200, current_route_id: 1, status: 'em_rota',    latitude: -23.5558, longitude: -46.6650 },
-  { id: 2, plate: 'DEF-5678', driver: 'Marcos Lima',     capacity_kg: 8000, current_load_kg: 3100, current_route_id: 2, status: 'em_rota',    latitude: -23.5480, longitude: -46.6400 },
-  { id: 3, plate: 'GHI-9012', driver: 'Paulo Santos',    capacity_kg: 6000, current_load_kg: 6000, current_route_id: null, status: 'retornando', latitude: -23.5631, longitude: -46.6544 },
-  { id: 4, plate: 'JKL-3456', driver: 'Roberto Alves',   capacity_kg: 8000, current_load_kg: 0,    current_route_id: null, status: 'aguardando' },
+  { id: 1, plate: 'ABC-1234', driver: 'Carlos Oliveira', capacity_kg: 8000, current_load_kg: 6200, current_route_id: 1, status: 'em_rota', latitude: -23.5558, longitude: -46.6650 },
+  { id: 2, plate: 'DEF-5678', driver: 'Marcos Lima', capacity_kg: 8000, current_load_kg: 3100, current_route_id: 2, status: 'em_rota', latitude: -23.5480, longitude: -46.6400 },
+  { id: 3, plate: 'GHI-9012', driver: 'Paulo Santos', capacity_kg: 6000, current_load_kg: 6000, current_route_id: null, status: 'retornando', latitude: -23.5631, longitude: -46.6544 },
+  { id: 4, plate: 'JKL-3456', driver: 'Roberto Alves', capacity_kg: 8000, current_load_kg: 0, current_route_id: null, status: 'aguardando' },
 ];
 
 export const MOCK_ROUTES: Route[] = [
@@ -65,7 +67,7 @@ export const MOCK_STATS: DashboardStats = {
     { label: 'Qui', count: 15 },
     { label: 'Sex', count: 20 },
     { label: 'Sáb', count: 14 },
-    { label: 'Dom', count: 9  },
+    { label: 'Dom', count: 9 },
   ],
   level_by_hour: [
     { label: '08h', level: 20 },
@@ -76,8 +78,8 @@ export const MOCK_STATS: DashboardStats = {
     { label: '18h', level: 90 },
   ],
   critical_bins: [
-    { name: 'Hospital',         level: 92, predicted_full_in_h: 0.8 },
-    { name: 'Praça Central',    level: 88, predicted_full_in_h: 1.2 },
+    { name: 'Hospital', level: 92, predicted_full_in_h: 0.8 },
+    { name: 'Praça Central', level: 88, predicted_full_in_h: 1.2 },
     { name: 'Parque Municipal', level: 81, predicted_full_in_h: 1.9 },
   ],
 };
@@ -151,10 +153,17 @@ export const MOCK_ALERTS: Alert[] = [
   },
 ];
 
-export const DEFAULT_ALERT_SETTINGS: AlertSettings = {
-  sound_enabled:  true,
+export const DEFAULT_ALERT_SETTINGS: NotificationSettings = {
+  bin_full_threshold: 80,
+  bin_critical_threshold: 95,
+  truck_stopped_minutes: 20,
+  sound_enabled: true,
   visual_enabled: true,
-  min_severity:   'media',
+  email_enabled: false,
+  email_recipients: [],
+  sms_enabled: false,
+  sms_recipients: [],
+  min_severity: 'media',
 };
 
 export const MOCK_DRIVERS: Driver[] = [
@@ -197,12 +206,12 @@ export const MOCK_DRIVERS: Driver[] = [
 ];
 
 export const MOCK_DRIVER_METRICS: DriverMetrics[] = [
-  { driver_id: 1, collections_today: 8,  collections_month: 142, km_today: 34, km_month: 612,  avg_collection_min: 18, efficiency_pct: 94, on_time_pct: 96 },
-  { driver_id: 2, collections_today: 6,  collections_month: 128, km_today: 22, km_month: 534,  avg_collection_min: 22, efficiency_pct: 87, on_time_pct: 91 },
-  { driver_id: 3, collections_today: 11, collections_month: 178, km_today: 48, km_month: 821,  avg_collection_min: 15, efficiency_pct: 98, on_time_pct: 99 },
-  { driver_id: 4, collections_today: 0,  collections_month: 89,  km_today: 0,  km_month: 341,  avg_collection_min: 24, efficiency_pct: 72, on_time_pct: 78 },
-  { driver_id: 5, collections_today: 0,  collections_month: 156, km_today: 0,  km_month: 698,  avg_collection_min: 19, efficiency_pct: 91, on_time_pct: 94 },
-  { driver_id: 6, collections_today: 4,  collections_month: 201, km_today: 18, km_month: 934,  avg_collection_min: 14, efficiency_pct: 99, on_time_pct: 100 },
+  { driver_id: 1, collections_today: 8, collections_month: 142, km_today: 34, km_month: 612, avg_collection_min: 18, efficiency_pct: 94, on_time_pct: 96 },
+  { driver_id: 2, collections_today: 6, collections_month: 128, km_today: 22, km_month: 534, avg_collection_min: 22, efficiency_pct: 87, on_time_pct: 91 },
+  { driver_id: 3, collections_today: 11, collections_month: 178, km_today: 48, km_month: 821, avg_collection_min: 15, efficiency_pct: 98, on_time_pct: 99 },
+  { driver_id: 4, collections_today: 0, collections_month: 89, km_today: 0, km_month: 341, avg_collection_min: 24, efficiency_pct: 72, on_time_pct: 78 },
+  { driver_id: 5, collections_today: 0, collections_month: 156, km_today: 0, km_month: 698, avg_collection_min: 19, efficiency_pct: 91, on_time_pct: 94 },
+  { driver_id: 6, collections_today: 4, collections_month: 201, km_today: 18, km_month: 934, avg_collection_min: 14, efficiency_pct: 99, on_time_pct: 100 },
 ];
 
 // ── Dados para Relatórios ─────────────────────────────────
@@ -213,45 +222,45 @@ export const MOCK_REPORT_DATA = {
     const date = new Date();
     date.setDate(date.getDate() - (29 - i));
     return {
-      date:       date.toISOString().split('T')[0],
-      label:      date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
-      total:      Math.floor(Math.random() * 20 + 15),
-      zona_centro:Math.floor(Math.random() * 6 + 4),
+      date: date.toISOString().split('T')[0],
+      label: date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+      total: Math.floor(Math.random() * 20 + 15),
+      zona_centro: Math.floor(Math.random() * 6 + 4),
       zona_norte: Math.floor(Math.random() * 5 + 3),
-      zona_sul:   Math.floor(Math.random() * 5 + 3),
+      zona_sul: Math.floor(Math.random() * 5 + 3),
       zona_leste: Math.floor(Math.random() * 4 + 2),
       zona_oeste: Math.floor(Math.random() * 4 + 2),
-      kg_total:   Math.floor(Math.random() * 2000 + 1500),
+      kg_total: Math.floor(Math.random() * 2000 + 1500),
     };
   }),
 
   // Performance por motorista (mês atual)
   driver_performance: [
-    { name: 'Carlos Oliveira',  collections: 142, km: 612,  efficiency: 94, on_time: 96,  avg_min: 18 },
-    { name: 'Marcos Lima',      collections: 128, km: 534,  efficiency: 87, on_time: 91,  avg_min: 22 },
-    { name: 'Paulo Santos',     collections: 178, km: 821,  efficiency: 98, on_time: 99,  avg_min: 15 },
-    { name: 'Roberto Alves',    collections: 89,  km: 341,  efficiency: 72, on_time: 78,  avg_min: 24 },
-    { name: 'Fernanda Costa',   collections: 156, km: 698,  efficiency: 91, on_time: 94,  avg_min: 19 },
-    { name: 'Diego Ferreira',   collections: 201, km: 934,  efficiency: 99, on_time: 100, avg_min: 14 },
+    { name: 'Carlos Oliveira', collections: 142, km: 612, efficiency: 94, on_time: 96, avg_min: 18 },
+    { name: 'Marcos Lima', collections: 128, km: 534, efficiency: 87, on_time: 91, avg_min: 22 },
+    { name: 'Paulo Santos', collections: 178, km: 821, efficiency: 98, on_time: 99, avg_min: 15 },
+    { name: 'Roberto Alves', collections: 89, km: 341, efficiency: 72, on_time: 78, avg_min: 24 },
+    { name: 'Fernanda Costa', collections: 156, km: 698, efficiency: 91, on_time: 94, avg_min: 19 },
+    { name: 'Diego Ferreira', collections: 201, km: 934, efficiency: 99, on_time: 100, avg_min: 14 },
   ],
 
   // Eficiência das rotas (mês atual)
   route_efficiency: [
-    { route: 'Rota #1 — Centro',   total_runs: 22, on_time: 21, avg_stops: 8,  avg_km: 12.4, completion: 98 },
-    { route: 'Rota #2 — Norte',    total_runs: 20, on_time: 18, avg_stops: 7,  avg_km: 9.8,  completion: 94 },
-    { route: 'Rota #3 — Sul',      total_runs: 21, on_time: 19, avg_stops: 9,  avg_km: 14.2, completion: 96 },
-    { route: 'Rota #4 — Leste',    total_runs: 18, on_time: 14, avg_stops: 6,  avg_km: 11.1, completion: 87 },
-    { route: 'Rota #5 — Oeste',    total_runs: 19, on_time: 17, avg_stops: 7,  avg_km: 10.6, completion: 92 },
+    { route: 'Rota #1 — Centro', total_runs: 22, on_time: 21, avg_stops: 8, avg_km: 12.4, completion: 98 },
+    { route: 'Rota #2 — Norte', total_runs: 20, on_time: 18, avg_stops: 7, avg_km: 9.8, completion: 94 },
+    { route: 'Rota #3 — Sul', total_runs: 21, on_time: 19, avg_stops: 9, avg_km: 14.2, completion: 96 },
+    { route: 'Rota #4 — Leste', total_runs: 18, on_time: 14, avg_stops: 6, avg_km: 11.1, completion: 87 },
+    { route: 'Rota #5 — Oeste', total_runs: 19, on_time: 17, avg_stops: 7, avg_km: 10.6, completion: 92 },
   ],
 
   // KPIs gerais do mês
   monthly_kpis: {
-    total_collections:  894,
-    total_kg:           48_230,
-    total_km:           3_940,
-    avg_efficiency:     91.2,
-    full_bins_avoided:  312,
-    cost_saved_brl:     18_400,
+    total_collections: 894,
+    total_kg: 48_230,
+    total_km: 3_940,
+    avg_efficiency: 91.2,
+    full_bins_avoided: 312,
+    cost_saved_brl: 18_400,
   },
 };
 
@@ -265,9 +274,9 @@ export const MOCK_MAINTENANCE: Maintenance[] = [
     workshop: 'Auto Center Silva', mechanic: 'João Mecânico',
     labor_cost_brl: 450,
     parts: [
-      { name: 'Filtro de óleo',   quantity: 1, cost_brl: 35  },
+      { name: 'Filtro de óleo', quantity: 1, cost_brl: 35 },
       { name: 'Óleo motor 15W40', quantity: 6, cost_brl: 180 },
-      { name: 'Filtro de ar',     quantity: 1, cost_brl: 45  },
+      { name: 'Filtro de ar', quantity: 1, cost_brl: 45 },
     ],
     notes: 'Revisão realizada sem intercorrências.',
   },
@@ -281,7 +290,7 @@ export const MOCK_MAINTENANCE: Maintenance[] = [
     labor_cost_brl: 280,
     parts: [
       { name: 'Pastilha de freio dianteira', quantity: 1, cost_brl: 120 },
-      { name: 'Pastilha de freio traseira',  quantity: 1, cost_brl: 95  },
+      { name: 'Pastilha de freio traseira', quantity: 1, cost_brl: 95 },
     ],
     notes: 'Desgaste acima do normal — verificar rodagem.',
   },
@@ -307,8 +316,8 @@ export const MOCK_MAINTENANCE: Maintenance[] = [
     workshop: 'Elétrica Veicular SP', mechanic: 'Marcos Elétrica',
     labor_cost_brl: 850,
     parts: [
-      { name: 'Alternador',    quantity: 1, cost_brl: 620 },
-      { name: 'Correia dentada',quantity: 1, cost_brl: 85 },
+      { name: 'Alternador', quantity: 1, cost_brl: 620 },
+      { name: 'Correia dentada', quantity: 1, cost_brl: 85 },
     ],
     notes: 'Veículo ficou parado 1 dia. Causa: alternador queimado.',
   },
@@ -447,5 +456,28 @@ export const MOCK_ZONES: Zone[] = [
     avg_collection_freq_days: 2.0,
     last_collection: new Date(Date.now() - 5 * 3600000).toISOString(),
     critical_bins: ['Estação da Luz'],
+  },
+];
+
+
+export const MOCK_TENANTS: Tenant[] = [
+  {
+    id: '46395000000139',
+    name: 'Prefeitura de São Paulo',
+    city: 'São Paulo', state: 'SP',
+    plan: 'enterprise', active: true,
+    logo_url: '',
+  },
+  {
+    id: '69597457000155',
+    name: 'Prefeitura de Campinas',
+    city: 'Campinas', state: 'SP',
+    plan: 'profissional', active: true,
+  },
+  {
+    id: '001',
+    name: 'EcoTrack Demo',
+    city: 'Demo', state: 'SP',
+    plan: 'basico', active: true,
   },
 ];

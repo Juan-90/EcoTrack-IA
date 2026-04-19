@@ -4,8 +4,9 @@
 import { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useThemeStore } from '../../store/themeStore';
-import { RefreshCw, Bell, Sun, Moon, Leaf } from 'lucide-react';
+import { RefreshCw, Bell, Sun, Moon, Building2, Leaf } from 'lucide-react';
 import { useAlerts } from '../../hooks/useAlerts';
+import { useTenantStore } from '../../store/tenantStore';
 
 interface HeaderProps { title: string; subtitle?: string; }
 
@@ -15,6 +16,7 @@ export default function Header({ title, subtitle }: HeaderProps) {
   const qc = useQueryClient();
   const { theme, cycleTheme } = useThemeStore();
   const { activeCount } = useAlerts();
+  const { tenant } = useTenantStore();
 
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000);
@@ -44,6 +46,19 @@ export default function Header({ title, subtitle }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-3">
+
+        {/* Tenant ativo */}
+        {tenant && (
+          <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-lg border"
+            style={{ background: 'rgba(74,222,128,0.05)', borderColor: 'rgba(74,222,128,0.15)' }}>
+            <Building2 className="w-3 h-3 flex-shrink-0" style={{ color: 'var(--accent)' }} />
+            <span className="text-[10px] font-mono truncate max-w-[140px]"
+              style={{ color: 'var(--accent)' }}>
+              {tenant.name}
+            </span>
+          </div>
+        )}
+
         {/* Live */}
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">

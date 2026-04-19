@@ -106,6 +106,7 @@ export interface NotificationSettings {
   email_recipients:       string[];
   sms_enabled:            boolean;
   sms_recipients:         string[];
+  min_severity:           AlertSeverity;
 }
 
 export interface AlertSettings {
@@ -252,4 +253,29 @@ export interface IntegrationSettings {
   sms_provider:    string;
   sms_api_key:     string;
   sms_from:        string;
+}
+
+// ── Multi-Tenant ──────────────────────────────────────────
+export interface Tenant {
+  id:        string;   // CNPJ formatado ou ID numérico
+  name:      string;   // "Prefeitura de São Paulo"
+  city:      string;
+  state:     string;
+  plan:      'basico' | 'profissional' | 'enterprise';
+  active:    boolean;
+  logo_url?: string;
+}
+
+export interface Alert {
+  id:           string;
+  type:         AlertType;
+  severity:     AlertSeverity;
+  status:       AlertStatus;
+  title:        string;
+  description:  string;
+  entity_id:    number;
+  entity_name:  string;
+  created_at:   string;
+  resolved_at:  string | null;
+  auto_resolve: boolean;
 }

@@ -14,6 +14,7 @@ from app.api.routes.routes    import router as routes_router
 from app.api.routes.analytics import router as analytics_router
 from app.api.routes.shifts    import router as shifts_router
 from app.core.scheduler       import start_scheduler, stop_scheduler
+from app.api.routes.tenants import router as tenants_router
 
 create_tables()
 
@@ -50,6 +51,7 @@ app.include_router(trucks_router)
 app.include_router(routes_router)
 app.include_router(analytics_router)
 app.include_router(shifts_router)
+app.include_router(tenants_router)
 
 
 @app.get("/", tags=["Health"])
