@@ -1,24 +1,111 @@
+import { useMemo } from 'react'
 import { useParams } from 'react-router-dom'
+import Badge from '../components/ui/Badge'
+import Card from '../components/ui/Card'
+import { companyClients } from '../services/mockData'
+
+function deploymentVariant(status: 'Online' | 'Degradado' | 'Offline'): 'success' | 'warning' | 'danger' {
+  if (status === 'Online') return 'success'
+  if (status === 'Degradado') return 'warning'
+  return 'danger'
+}
 
 export default function ClientDetail() {
   const { clientId } = useParams()
 
+  const client = useMemo(
+    () => companyClients.find((item) => item.slug === clientId),
+    [clientId],
+  )
+
+  if (!client) {
+    return (
+      <Card title="Cliente não encontrado">
+        <p style={{ color: 'var(--text-muted)' }}>
+          Não foi possível localizar o tenant solicitado.
+        </p>
+      </Card>
+    )
+  }
+
   return (
-    <section
-      className="rounded-[28px] border p-6"
-      style={{
-        background: 'var(--surface)',
-        borderColor: 'var(--border)',
-        boxShadow: 'var(--shadow)',
-      }}
-    >
-      <h3 className="text-xl font-bold">Detalhes do cliente</h3>
-      <p className="mt-3 text-sm" style={{ color: 'var(--text-muted)' }}>
-        Cliente selecionado: <span className="font-semibold">{clientId}</span>
-      </p>
-      <p className="mt-4 text-sm" style={{ color: 'var(--text-muted)' }}>
-        Na próxima parte vamos montar KPIs, contrato, licenças, usuários e saúde operacional por tenant.
-      </p>
+    <section className="space-y-6">
+      <Card
+        title={client.name}
+        description={`${client.city}/${client.state} · ${client.type}`}
+        rightSlot={<Badge variant={deploymentVariant(client.deploymentStatus)}>{client.deploymentStatus}</Badge>}
+      >
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--border)' }}>
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Plano</p>
+            <p className="mt-2 text-xl font-bold">{client.plan}</p>
+          </div>
+
+          <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--border)' }}>
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>MRR</p>
+            <p className="mt-2 text-xl font-bold">
+              {client.monthlyRevenue.toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+              })}
+            </p>
+          </div>
+
+          <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--border)' }}>
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Usuários ativos</p>
+            <p className="mt-2 text-xl font-bold">{client.activeUsers}</p>
+          </div>
+
+          <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--border)' }}>
+            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Lixeiras monitoradas</p>
+            <p className="mt-2 text-xl font-bold">{client.monitoredBins}</p>
+          </div>
+        </div>
+      </Card>
+
+      <div className="grid gap-6 xl:grid-cols-2">
+        <Card title="Saúde operacional" description="Indicadores essenciais do tenant.">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between rounded-2xl border p-4" style={{ borderColor: 'var(--border)' }}>
+              <span>Eficiência de coleta</span>
+              <strong>{client.collectionEfficiency}%</strong>
+            </div>
+            <div className="flex items-center justify-between rounded-2xl border p-4" style={{ borderColor: 'var(--border)' }}>
+              <span>Uso de licenças</span>
+              <strong>{client.licenseUsage}%</strong>
+            </div>
+            <div className="flex items-center justify-between rounded-2xl border p-4" style={{ borderColor: 'var(--border)' }}>
+              <span>Versão implantada</span>
+              <strong>{client.version}</strong>
+            </div>
+            <div className="flex items-center justify-between rounded-2xl border p-4" style={{ borderColor: 'var(--border)' }}>
+              <span>Uptime</span>
+              <strong>{client.uptime}</strong>
+            </div>
+          </div>
+        </Card>
+
+        <Card title="Gestão comercial" description="Visão da conta e relacionamento.">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between rounded-2xl border p-4" style={{ borderColor: 'var(--border)' }}>
+              <span>Status da conta</span>
+              <strong>{client.status}</strong>
+            </div>
+            <div className="flex items-center justify-between rounded-2xl border p-4" style={{ borderColor: 'var(--border)' }}>
+              <span>Ativação</span>
+              <strong>{new Date(client.activatedAt).toLocaleDateString('pt-BR')}</strong>
+            </div>
+            <div className="flex items-center justify-between rounded-2xl border p-4" style={{ borderColor: 'var(--border)' }}>
+              <span>Fim do contrato</span>
+              <strong>{new Date(client.contractEndsAt).toLocaleDateString('pt-BR')}</strong>
+            </div>
+            <div className="flex items-center justify-between rounded-2xl border p-4" style={{ borderColor: 'var(--border)' }}>
+              <span>Responsável interno</span>
+              <strong>{client.internalOwner}</strong>
+            </div>
+          </div>
+        </Card>
+      </div>
     </section>
   )
 }

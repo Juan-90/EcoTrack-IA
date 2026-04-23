@@ -1,48 +1,89 @@
 import { Link } from 'react-router-dom'
+import Badge from '../components/ui/Badge'
+import Card from '../components/ui/Card'
+import Table from '../components/ui/Table'
+import { companyClients } from '../services/mockData'
+import type { CompanyClient } from '../types'
 
-const clients = [
-  { id: 'sp-prefeitura', name: 'Prefeitura de São Paulo', type: 'Prefeitura', status: 'Ativo' },
-  { id: 'campinas-prefeitura', name: 'Prefeitura de Campinas', type: 'Prefeitura', status: 'Ativo' },
-  { id: 'coleta-verde', name: 'Coleta Verde Ambiental', type: 'Empresa de coleta', status: 'Onboarding' },
-]
+function statusVariant(status: CompanyClient['status']): 'success' | 'warning' | 'danger' | 'neutral' | 'info' {
+  if (status === 'Ativo') return 'success'
+  if (status === 'Onboarding') return 'info'
+  if (status === 'Atenção') return 'warning'
+  if (status === 'Inativo') return 'danger'
+  return 'neutral'
+}
+
+function deploymentVariant(status: CompanyClient['deploymentStatus']): 'success' | 'warning' | 'danger' {
+  if (status === 'Online') return 'success'
+  if (status === 'Degradado') return 'warning'
+  return 'danger'
+}
 
 export default function Clients() {
   return (
-    <section
-      className="rounded-[28px] border p-6"
-      style={{
-        background: 'var(--surface)',
-        borderColor: 'var(--border)',
-        boxShadow: 'var(--shadow)',
-      }}
+    <Card
+      title="Base de clientes"
+      description="Prefeituras e operadores privados atendidos pela EcoTrack."
     >
-      <h3 className="text-xl font-bold">Base de clientes</h3>
-      <div className="mt-6 overflow-hidden rounded-2xl border" style={{ borderColor: 'var(--border)' }}>
-        <table className="w-full border-collapse text-left">
-          <thead style={{ background: 'var(--surface-alt)' }}>
-            <tr>
-              <th className="px-4 py-3 text-sm">Cliente</th>
-              <th className="px-4 py-3 text-sm">Tipo</th>
-              <th className="px-4 py-3 text-sm">Status</th>
-              <th className="px-4 py-3 text-sm">Ação</th>
-            </tr>
-          </thead>
-          <tbody>
-            {clients.map((client) => (
-              <tr key={client.id} className="border-t" style={{ borderColor: 'var(--border)' }}>
-                <td className="px-4 py-4 text-sm font-medium">{client.name}</td>
-                <td className="px-4 py-4 text-sm">{client.type}</td>
-                <td className="px-4 py-4 text-sm">{client.status}</td>
-                <td className="px-4 py-4 text-sm">
-                  <Link to={`/clients/${client.id}`} style={{ color: 'var(--accent)' }}>
-                    Ver detalhes
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </section>
+      <Table
+        data={companyClients}
+        columns={[
+          {
+            key: 'client',
+            header: 'Cliente',
+            render: (client) => (
+              <div>
+                <p className="font-semibold">{client.name}</p>
+                <p style={{ color: 'var(--text-muted)' }}>
+                  {client.city}/{client.state}
+                </p>
+              </div>
+            ),
+          },
+          {
+            key: 'type',
+            header: 'Tipo',
+            render: (client) => client.type,
+          },
+          {
+            key: 'plan',
+            header: 'Plano',
+            render: (client) => client.plan,
+          },
+          {
+            key: 'status',
+            header: 'Status',
+            render: (client) => <Badge variant={statusVariant(client.status)}>{client.status}</Badge>,
+          },
+          {
+            key: 'deployment',
+            header: 'Deployment',
+            render: (client) => (
+              <Badge variant={deploymentVariant(client.deploymentStatus)}>
+                {client.deploymentStatus}
+              </Badge>
+            ),
+          },
+          {
+            key: 'revenue',
+            header: 'MRR',
+            render: (client) =>
+              client.monthlyRevenue.toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+              }),
+          },
+          {
+            key: 'action',
+            header: 'Ação',
+            render: (client) => (
+              <Link to={`/clients/${client.slug}`} style={{ color: 'var(--accent)' }}>
+                Ver detalhes
+              </Link>
+            ),
+          },
+        ]}
+      />
+    </Card>
   )
 }
