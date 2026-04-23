@@ -1,4 +1,14 @@
-import { Building2, ChartColumn, LayoutDashboard, RadioTower, Settings, ShieldCheck } from 'lucide-react'
+import {
+  Building2,
+  ChartColumn,
+  LayoutDashboard,
+  Menu,
+  RadioTower,
+  Settings,
+  ShieldCheck,
+  X,
+} from 'lucide-react'
+import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 
 const navItems = [
@@ -10,12 +20,9 @@ const navItems = [
   { to: '/settings', label: 'Configurações', icon: Settings },
 ]
 
-export default function Sidebar() {
+function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   return (
-    <aside
-      className="hidden min-h-screen w-72 shrink-0 border-r lg:flex lg:flex-col"
-      style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
-    >
+    <>
       <div className="border-b px-6 py-6" style={{ borderColor: 'var(--border)' }}>
         <div className="flex items-center gap-3">
           <div
@@ -40,6 +47,7 @@ export default function Sidebar() {
             key={to}
             to={to}
             end={to === '/'}
+            onClick={onNavigate}
             className="flex items-center gap-3 rounded-2xl border px-4 py-3 text-sm font-medium transition"
             style={({ isActive }) =>
               isActive
@@ -67,6 +75,64 @@ export default function Sidebar() {
           Controle multi-tenant da plataforma
         </p>
       </div>
-    </aside>
+    </>
+  )
+}
+
+export default function Sidebar() {
+  const [mobileOpen, setMobileOpen] = useState(false)
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setMobileOpen(true)}
+        className="fixed left-4 top-4 z-40 rounded-2xl border p-3 lg:hidden"
+        style={{
+          background: 'var(--surface)',
+          borderColor: 'var(--border)',
+          boxShadow: 'var(--shadow)',
+        }}
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+
+      <aside
+        className="hidden min-h-screen w-72 shrink-0 border-r lg:flex lg:flex-col"
+        style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+      >
+        <SidebarContent />
+      </aside>
+
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 flex lg:hidden">
+          <div
+            className="w-72 border-r"
+            style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+          >
+            <div className="flex items-center justify-end px-4 py-4">
+              <button
+                type="button"
+                onClick={() => setMobileOpen(false)}
+                className="rounded-xl border p-2"
+                style={{ borderColor: 'var(--border)' }}
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="flex h-[calc(100%-64px)] flex-col">
+              <SidebarContent onNavigate={() => setMobileOpen(false)} />
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="flex-1 bg-black/30"
+            onClick={() => setMobileOpen(false)}
+          />
+        </div>
+      )}
+    </>
   )
 }

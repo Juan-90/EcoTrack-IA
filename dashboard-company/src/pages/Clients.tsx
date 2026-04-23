@@ -1,8 +1,10 @@
+import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import Badge from '../components/ui/Badge'
 import Card from '../components/ui/Card'
 import Table from '../components/ui/Table'
-import { companyClients } from '../services/mockData'
+import { companyApi } from '../services/api'
+import { formatCurrency } from '../utils/format'
 import type { CompanyClient } from '../types'
 
 function statusVariant(status: CompanyClient['status']): 'success' | 'warning' | 'danger' | 'neutral' | 'info' {
@@ -20,13 +22,18 @@ function deploymentVariant(status: CompanyClient['deploymentStatus']): 'success'
 }
 
 export default function Clients() {
+  const { data: clients = [] } = useQuery({
+    queryKey: ['company-clients'],
+    queryFn: companyApi.getClients,
+  })
+
   return (
     <Card
       title="Base de clientes"
       description="Prefeituras e operadores privados atendidos pela EcoTrack."
     >
-      <Table
-        data={companyClients}
+      <Table<CompanyClient>
+        data={clients}
         columns={[
           {
             key: 'client',
@@ -67,11 +74,7 @@ export default function Clients() {
           {
             key: 'revenue',
             header: 'MRR',
-            render: (client) =>
-              client.monthlyRevenue.toLocaleString('pt-BR', {
-                style: 'currency',
-                currency: 'BRL',
-              }),
+            render: (client) => formatCurrency(client.monthlyRevenue),
           },
           {
             key: 'action',

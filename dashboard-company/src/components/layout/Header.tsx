@@ -9,19 +9,19 @@ export default function Header({ title, subtitle }: HeaderProps) {
       className="border-b px-6 py-5 md:px-8"
       style={{ background: 'rgba(255,255,255,0.72)', borderColor: 'var(--border)' }}
     >
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="pl-14 lg:pl-0">
           <p className="text-xs font-semibold uppercase tracking-[0.3em]" style={{ color: 'var(--accent)' }}>
             Plataforma Corporativa
           </p>
-          <h2 className="mt-2 text-3xl font-bold">{title}</h2>
-          <p className="mt-2 text-sm" style={{ color: 'var(--text-muted)' }}>
+          <h2 className="mt-2 text-2xl font-bold md:text-3xl">{title}</h2>
+          <p className="mt-2 max-w-2xl text-sm" style={{ color: 'var(--text-muted)' }}>
             {subtitle}
           </p>
         </div>
 
         <div
-          className="rounded-2xl border px-4 py-3 text-right"
+          className="rounded-2xl border px-4 py-3 text-left lg:text-right"
           style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
         >
           <p className="text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: 'var(--accent)' }}>

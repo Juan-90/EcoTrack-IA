@@ -1,7 +1,9 @@
+import { useQuery } from '@tanstack/react-query'
 import Badge from '../components/ui/Badge'
 import Card from '../components/ui/Card'
 import Table from '../components/ui/Table'
-import { companyClients } from '../services/mockData'
+import { companyApi } from '../services/api'
+import type { CompanyClient } from '../types'
 
 function deploymentVariant(status: 'Online' | 'Degradado' | 'Offline'): 'success' | 'warning' | 'danger' {
   if (status === 'Online') return 'success'
@@ -10,13 +12,18 @@ function deploymentVariant(status: 'Online' | 'Degradado' | 'Offline'): 'success
 }
 
 export default function Deployments() {
+  const { data: clients = [] } = useQuery({
+    queryKey: ['company-deployments'],
+    queryFn: companyApi.getClients,
+  })
+
   return (
     <Card
       title="Monitoramento de deployments"
       description="Status consolidado das instâncias ativas por cliente."
     >
-      <Table
-        data={companyClients}
+      <Table<CompanyClient>
+        data={clients}
         columns={[
           { key: 'client', header: 'Cliente', render: (client) => client.name },
           {

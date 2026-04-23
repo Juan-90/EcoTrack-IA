@@ -1,4 +1,5 @@
 import { BarChart3, Building2, CircleAlert, Wallet } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
 import {
   ResponsiveContainer,
   AreaChart,
@@ -10,7 +11,8 @@ import {
 } from 'recharts'
 import Card from '../components/ui/Card'
 import Badge from '../components/ui/Badge'
-import { companyAlerts, companyKpis, companyTrend } from '../services/mockData'
+import { companyApi } from '../services/api'
+import type { CompanyAlert, CompanyKpi } from '../types'
 
 const iconMap = [Building2, Wallet, BarChart3, CircleAlert]
 
@@ -21,11 +23,26 @@ function alertVariant(severity: string): 'danger' | 'warning' | 'neutral' {
 }
 
 export default function Dashboard() {
+  const { data: kpis = [] } = useQuery({
+    queryKey: ['company-kpis'],
+    queryFn: companyApi.getKpis,
+  })
+
+  const { data: alerts = [] } = useQuery({
+    queryKey: ['company-alerts'],
+    queryFn: companyApi.getAlerts,
+  })
+
+  const { data: trend = [] } = useQuery({
+    queryKey: ['company-trend'],
+    queryFn: companyApi.getTrend,
+  })
+
   return (
     <section className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {companyKpis.map((card, index) => {
-          const Icon = iconMap[index]
+        {kpis.map((card: CompanyKpi, index: number) => {
+          const Icon = iconMap[index] ?? Building2
 
           return (
             <Card
@@ -58,7 +75,7 @@ export default function Dashboard() {
         >
           <div className="h-[320px]">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={companyTrend}>
+              <AreaChart data={trend}>
                 <defs>
                   <linearGradient id="revenueFill" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#1f8f5f" stopOpacity={0.35} />
@@ -87,7 +104,7 @@ export default function Dashboard() {
           description="Itens que precisam de ação do time interno."
         >
           <div className="space-y-4">
-            {companyAlerts.map((alert) => (
+            {alerts.map((alert: CompanyAlert) => (
               <div
                 key={alert.id}
                 className="rounded-2xl border p-4"

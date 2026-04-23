@@ -1,8 +1,9 @@
-import { useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'react-router-dom'
 import Badge from '../components/ui/Badge'
 import Card from '../components/ui/Card'
-import { companyClients } from '../services/mockData'
+import { companyApi } from '../services/api'
+import { formatCurrency, formatDate, formatPercent } from '../utils/format'
 
 function deploymentVariant(status: 'Online' | 'Degradado' | 'Offline'): 'success' | 'warning' | 'danger' {
   if (status === 'Online') return 'success'
@@ -11,12 +12,20 @@ function deploymentVariant(status: 'Online' | 'Degradado' | 'Offline'): 'success
 }
 
 export default function ClientDetail() {
-  const { clientId } = useParams()
+  const { clientId = '' } = useParams()
 
-  const client = useMemo(
-    () => companyClients.find((item) => item.slug === clientId),
-    [clientId],
-  )
+  const { data: client, isLoading } = useQuery({
+    queryKey: ['company-client', clientId],
+    queryFn: () => companyApi.getClientBySlug(clientId),
+  })
+
+  if (isLoading) {
+    return (
+      <Card title="Carregando cliente">
+        <p style={{ color: 'var(--text-muted)' }}>Buscando dados da conta...</p>
+      </Card>
+    )
+  }
 
   if (!client) {
     return (
@@ -43,12 +52,7 @@ export default function ClientDetail() {
 
           <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--border)' }}>
             <p className="text-sm" style={{ color: 'var(--text-muted)' }}>MRR</p>
-            <p className="mt-2 text-xl font-bold">
-              {client.monthlyRevenue.toLocaleString('pt-BR', {
-                style: 'currency',
-                currency: 'BRL',
-              })}
-            </p>
+            <p className="mt-2 text-xl font-bold">{formatCurrency(client.monthlyRevenue)}</p>
           </div>
 
           <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--border)' }}>
@@ -68,11 +72,11 @@ export default function ClientDetail() {
           <div className="space-y-4">
             <div className="flex items-center justify-between rounded-2xl border p-4" style={{ borderColor: 'var(--border)' }}>
               <span>Eficiência de coleta</span>
-              <strong>{client.collectionEfficiency}%</strong>
+              <strong>{formatPercent(client.collectionEfficiency)}</strong>
             </div>
             <div className="flex items-center justify-between rounded-2xl border p-4" style={{ borderColor: 'var(--border)' }}>
               <span>Uso de licenças</span>
-              <strong>{client.licenseUsage}%</strong>
+              <strong>{formatPercent(client.licenseUsage)}</strong>
             </div>
             <div className="flex items-center justify-between rounded-2xl border p-4" style={{ borderColor: 'var(--border)' }}>
               <span>Versão implantada</span>
@@ -93,11 +97,11 @@ export default function ClientDetail() {
             </div>
             <div className="flex items-center justify-between rounded-2xl border p-4" style={{ borderColor: 'var(--border)' }}>
               <span>Ativação</span>
-              <strong>{new Date(client.activatedAt).toLocaleDateString('pt-BR')}</strong>
+              <strong>{formatDate(client.activatedAt)}</strong>
             </div>
             <div className="flex items-center justify-between rounded-2xl border p-4" style={{ borderColor: 'var(--border)' }}>
               <span>Fim do contrato</span>
-              <strong>{new Date(client.contractEndsAt).toLocaleDateString('pt-BR')}</strong>
+              <strong>{formatDate(client.contractEndsAt)}</strong>
             </div>
             <div className="flex items-center justify-between rounded-2xl border p-4" style={{ borderColor: 'var(--border)' }}>
               <span>Responsável interno</span>
