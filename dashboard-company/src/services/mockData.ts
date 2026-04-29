@@ -1,10 +1,19 @@
-import type { CompanyAlert, CompanyClient, CompanyKpi, CompanyTrendPoint } from '../types'
+import type {
+  CompanyAlert,
+  CompanyClient,
+  CompanyDeployment,
+  CompanyKpi,
+  CompanyTrendPoint,
+  InternalUser,
+  OperationalCard,
+  PermissionProfile,
+} from '../types'
 
 export const companyKpis: CompanyKpi[] = [
   { label: 'Clientes ativos', value: '24', hint: '+3 no trimestre' },
   { label: 'MRR consolidado', value: 'R$ 148.000', hint: 'Receita recorrente mensal' },
-  { label: 'Deployments saudáveis', value: '21', hint: '87,5% da base' },
-  { label: 'Licenças consumidas', value: '73%', hint: 'Média geral da operação' },
+  { label: 'Deployments saudaveis', value: '21', hint: '87,5% da base' },
+  { label: 'Licencas consumidas', value: '73%', hint: 'Media geral da operacao' },
 ]
 
 export const companyAlerts: CompanyAlert[] = [
@@ -13,18 +22,18 @@ export const companyAlerts: CompanyAlert[] = [
     title: 'Instabilidade de deployment',
     clientName: 'Prefeitura de Campinas',
     severity: 'Alta',
-    description: 'A instância apresentou aumento de erro 5xx nas últimas 2 horas.',
+    description: 'A instancia apresentou aumento de erro 5xx nas ultimas 2 horas.',
   },
   {
     id: 'alt-2',
-    title: 'Licença próxima do limite',
+    title: 'Licenca proxima do limite',
     clientName: 'Coleta Verde Ambiental',
     severity: 'Média',
     description: 'Uso de sensores licenciados atingiu 92% da capacidade contratada.',
   },
   {
     id: 'alt-3',
-    title: 'Renovação contratual próxima',
+    title: 'Renovacao contratual proxima',
     clientName: 'Prefeitura de Sorocaba',
     severity: 'Baixa',
     description: 'Contrato vence em 18 dias e exige contato comercial.',
@@ -44,10 +53,10 @@ export const companyClients: CompanyClient[] = [
   {
     id: '46395000000139',
     slug: 'prefeitura-sao-paulo',
-    name: 'Prefeitura de São Paulo',
+    name: 'Prefeitura de Sao Paulo',
     type: 'Prefeitura',
     status: 'Ativo',
-    city: 'São Paulo',
+    city: 'Sao Paulo',
     state: 'SP',
     plan: 'Enterprise',
     activatedAt: '2026-01-12',
@@ -110,7 +119,7 @@ export const companyClients: CompanyClient[] = [
     name: 'Coleta Verde Ambiental',
     type: 'Empresa de coleta',
     status: 'Ativo',
-    city: 'Ribeirão Preto',
+    city: 'Ribeirao Preto',
     state: 'SP',
     plan: 'Pro',
     activatedAt: '2025-08-19',
@@ -124,5 +133,154 @@ export const companyClients: CompanyClient[] = [
     uptime: '99.82%',
     contractEndsAt: '2026-08-19',
     internalOwner: 'Nelson Sousa',
+  },
+]
+
+export const companyDeployments: CompanyDeployment[] = [
+  {
+    id: 'dep-sp-prod',
+    clientSlug: 'prefeitura-sao-paulo',
+    clientName: 'Prefeitura de Sao Paulo',
+    environment: 'Production',
+    status: 'Online',
+    version: 'v2.8.1',
+    uptime: 99.98,
+    region: 'sa-east-1',
+    latencyMs: 84,
+    errorRate: 0.08,
+    lastIncidentAt: null,
+    lastDeployAt: '2026-04-27T11:40:00',
+    internalOwner: 'Juan Andrade',
+  },
+  {
+    id: 'dep-cps-prod',
+    clientSlug: 'prefeitura-campinas',
+    clientName: 'Prefeitura de Campinas',
+    environment: 'Production',
+    status: 'Degradado',
+    version: 'v2.7.4',
+    uptime: 98.91,
+    region: 'sa-east-1',
+    latencyMs: 241,
+    errorRate: 2.18,
+    lastIncidentAt: '2026-04-28T17:20:00',
+    lastDeployAt: '2026-04-22T09:15:00',
+    internalOwner: 'Mauricio Ferreira',
+  },
+  {
+    id: 'dep-demo-stg',
+    clientSlug: 'ecotrack-demo',
+    clientName: 'EcoTrack Demo',
+    environment: 'Staging',
+    status: 'Online',
+    version: 'v2.8.1',
+    uptime: 99.4,
+    region: 'local-lab',
+    latencyMs: 132,
+    errorRate: 0.24,
+    lastIncidentAt: null,
+    lastDeployAt: '2026-04-26T19:10:00',
+    internalOwner: 'Caio Mattos',
+  },
+  {
+    id: 'dep-verde-prod',
+    clientSlug: 'coleta-verde-ambiental',
+    clientName: 'Coleta Verde Ambiental',
+    environment: 'Production',
+    status: 'Online',
+    version: 'v2.8.0',
+    uptime: 99.82,
+    region: 'sa-east-1',
+    latencyMs: 101,
+    errorRate: 0.12,
+    lastIncidentAt: '2026-04-18T08:10:00',
+    lastDeployAt: '2026-04-20T10:05:00',
+    internalOwner: 'Nelson Sousa',
+  },
+]
+
+export const internalUsers: InternalUser[] = [
+  {
+    id: 'usr-1',
+    name: 'Juan Andrade',
+    role: 'Founder Admin',
+    email: 'juan@ecotrack.com',
+    status: 'Ativo',
+    scope: 'Comercial, plataforma e estrategia',
+    lastAccessAt: '2026-04-29T09:10:00',
+  },
+  {
+    id: 'usr-2',
+    name: 'Caio Mattos',
+    role: 'Backend Lead',
+    email: 'caio@ecotrack.com',
+    status: 'Ativo',
+    scope: 'Backend, releases e dados',
+    lastAccessAt: '2026-04-29T08:25:00',
+  },
+  {
+    id: 'usr-3',
+    name: 'Mauricio Ferreira',
+    role: 'IoT Operations',
+    email: 'mauricio@ecotrack.com',
+    status: 'Ativo',
+    scope: 'Operacao de campo e deployments',
+    lastAccessAt: '2026-04-29T07:55:00',
+  },
+  {
+    id: 'usr-4',
+    name: 'Nelson Sousa',
+    role: 'Support Analyst',
+    email: 'nelson@ecotrack.com',
+    status: 'Convidado',
+    scope: 'Suporte e QA operacional',
+    lastAccessAt: '2026-04-28T16:42:00',
+  },
+]
+
+export const permissionProfiles: PermissionProfile[] = [
+  {
+    id: 'perm-1',
+    name: 'Founder Admin',
+    description: 'Acesso completo a operacao, contratos, usuarios e configuracoes.',
+    members: 1,
+    capabilities: ['billing.write', 'users.manage', 'deployments.manage', 'tenants.manage'],
+  },
+  {
+    id: 'perm-2',
+    name: 'Operations Manager',
+    description: 'Opera a base de clientes e monitora saude dos ambientes.',
+    members: 1,
+    capabilities: ['deployments.read', 'deployments.manage', 'tenants.read', 'reports.export'],
+  },
+  {
+    id: 'perm-3',
+    name: 'Support Analyst',
+    description: 'Acompanha incidentes, acessa clientes e aciona suporte.',
+    members: 2,
+    capabilities: ['deployments.read', 'tenants.read', 'incidents.manage'],
+  },
+]
+
+export const operationalCards: OperationalCard[] = [
+  {
+    label: 'Playbooks ativos',
+    value: '12',
+    detail: 'Runbooks operacionais para incidentes, onboarding e rollout.',
+  },
+  {
+    label: 'Integracoes prioritarias',
+    value: '4',
+    detail: 'Billing, observabilidade, CRM e autenticacao corporativa.',
+  },
+  {
+    label: 'Ambientes monitorados',
+    value: '9',
+    detail: 'Entre producao, staging e pilotos acompanhados internamente.',
+  },
+  {
+    label: 'SLA interno',
+    value: '99.5%',
+    detail: 'Meta operacional para a plataforma EcoTrack Company.',
   },
 ]

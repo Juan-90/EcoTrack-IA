@@ -2,14 +2,22 @@ import axios from 'axios'
 import {
   companyAlerts,
   companyClients,
+  companyDeployments,
   companyKpis,
   companyTrend,
+  internalUsers,
+  operationalCards,
+  permissionProfiles,
 } from './mockData'
 import type {
   CompanyAlert,
   CompanyClient,
+  CompanyDeployment,
   CompanyKpi,
   CompanyTrendPoint,
+  InternalUser,
+  OperationalCard,
+  PermissionProfile,
 } from '../types'
 
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
@@ -70,6 +78,46 @@ export const companyApi = {
     }
 
     const { data } = await api.get<CompanyClient>(`/company/clients/${slug}`)
+    return data
+  },
+
+  getDeployments: async (): Promise<CompanyDeployment[]> => {
+    if (USE_MOCK) {
+      await delay()
+      return companyDeployments
+    }
+
+    const { data } = await api.get<CompanyDeployment[]>('/company/deployments')
+    return data
+  },
+
+  getInternalUsers: async (): Promise<InternalUser[]> => {
+    if (USE_MOCK) {
+      await delay()
+      return internalUsers
+    }
+
+    const { data } = await api.get<InternalUser[]>('/company/internal-users')
+    return data
+  },
+
+  getPermissionProfiles: async (): Promise<PermissionProfile[]> => {
+    if (USE_MOCK) {
+      await delay()
+      return permissionProfiles
+    }
+
+    const { data } = await api.get<PermissionProfile[]>('/company/permission-profiles')
+    return data
+  },
+
+  getOperationalCards: async (): Promise<OperationalCard[]> => {
+    if (USE_MOCK) {
+      await delay()
+      return operationalCards
+    }
+
+    const { data } = await api.get<OperationalCard[]>('/company/operational-cards')
     return data
   },
 }
