@@ -1,11 +1,12 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
+import RouteGuard from '../components/auth/RouteGuard'
 import Layout from '../components/layout/Layout'
-import Login from '../pages/Login'
-import Dashboard from '../pages/Dashboard'
-import Clients from '../pages/Clients'
-import ClientDetail from '../pages/ClientDetail'
-import Deployments from '../pages/Deployments'
 import Analytics from '../pages/Analytics'
+import ClientDetail from '../pages/ClientDetail'
+import Clients from '../pages/Clients'
+import Dashboard from '../pages/Dashboard'
+import Deployments from '../pages/Deployments'
+import Login from '../pages/Login'
 import Plans from '../pages/Plans'
 import Settings from '../pages/Settings'
 
@@ -14,7 +15,14 @@ export default function AppRoutes() {
     <Routes>
       <Route path="/login" element={<Login />} />
 
-      <Route path="/" element={<Layout />}>
+      <Route
+        path="/"
+        element={
+          <RouteGuard>
+            <Layout />
+          </RouteGuard>
+        }
+      >
         <Route index element={<Dashboard />} />
         <Route path="clients" element={<Clients />} />
         <Route path="clients/:clientId" element={<ClientDetail />} />

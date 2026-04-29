@@ -1,9 +1,19 @@
+import { useAuthStore } from '../../store/authStore'
+
 type HeaderProps = {
   title: string
   subtitle: string
 }
 
 export default function Header({ title, subtitle }: HeaderProps) {
+  const { user } = useAuthStore()
+
+  const roleLabel = user?.role === 'founder_admin'
+    ? 'Founder Admin'
+    : user?.role === 'operations_manager'
+      ? 'Operations Manager'
+      : 'Support Analyst'
+
   return (
     <header
       className="border-b px-6 py-5 md:px-8"
@@ -25,9 +35,12 @@ export default function Header({ title, subtitle }: HeaderProps) {
           style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
         >
           <p className="text-xs font-semibold uppercase tracking-[0.25em]" style={{ color: 'var(--accent)' }}>
-            Ambiente
+            Sessao
           </p>
-          <p className="mt-1 text-sm font-semibold">Operação Interna EcoTrack</p>
+          <p className="mt-1 text-sm font-semibold">{user?.name ?? 'Equipe EcoTrack'}</p>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+            {roleLabel}
+          </p>
         </div>
       </div>
     </header>

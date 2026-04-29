@@ -2,6 +2,7 @@ import {
   Building2,
   ChartColumn,
   LayoutDashboard,
+  LogOut,
   Menu,
   RadioTower,
   Settings,
@@ -10,6 +11,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
+import { useAuthStore } from '../../store/authStore'
 
 const navItems = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -17,10 +19,12 @@ const navItems = [
   { to: '/deployments', label: 'Deployments', icon: RadioTower },
   { to: '/analytics', label: 'Analytics', icon: ChartColumn },
   { to: '/plans', label: 'Planos', icon: ShieldCheck },
-  { to: '/settings', label: 'Configurações', icon: Settings },
+  { to: '/settings', label: 'Configuracoes', icon: Settings },
 ]
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+  const { user, logout } = useAuthStore()
+
   return (
     <>
       <div className="border-b px-6 py-6" style={{ borderColor: 'var(--border)' }}>
@@ -70,10 +74,27 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       </nav>
 
       <div className="border-t px-6 py-5" style={{ borderColor: 'var(--border)' }}>
-        <p className="text-sm font-semibold">EcoTrack HQ</p>
-        <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-          Controle multi-tenant da plataforma
-        </p>
+        <div className="space-y-3">
+          <div>
+            <p className="text-sm font-semibold">{user?.name ?? 'EcoTrack HQ'}</p>
+            <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+              {user?.email ?? 'Controle multi-tenant da plataforma'}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              logout()
+              onNavigate?.()
+            }}
+            className="flex w-full items-center gap-2 rounded-2xl border px-4 py-3 text-sm font-medium"
+            style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}
+          >
+            <LogOut className="h-4 w-4" />
+            Sair
+          </button>
+        </div>
       </div>
     </>
   )
