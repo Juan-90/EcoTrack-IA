@@ -11,7 +11,7 @@ export default function Login() {
   const navigate = useNavigate()
   const location = useLocation()
   const { login, isAuthenticated } = useAuthStore()
-  const [email, setEmail] = useState('juan@ecotrack.com')
+  const [email, setEmail] = useState('admin@ecotrack.com')
   const [password, setPassword] = useState('123456')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
@@ -83,9 +83,9 @@ export default function Login() {
               color: 'var(--text-muted)',
             }}
           >
-            Contas mock:
+            Conta principal de teste:
             <br />
-            `juan@ecotrack.com`, `operacoes@ecotrack.com`, `suporte@ecotrack.com`
+            `admin@ecotrack.com`
             <br />
             Senha padrao: `123456`
           </div>

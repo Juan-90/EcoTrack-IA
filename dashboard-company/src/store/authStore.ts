@@ -19,9 +19,9 @@ type AuthState = {
 const STORAGE_KEY = 'ecotrack-company-auth'
 
 const MOCK_USERS: Record<string, AuthUser & { password: string }> = {
-  'juan@ecotrack.com': {
-    name: 'Juan Andrade',
-    email: 'juan@ecotrack.com',
+  'admin@ecotrack.com': {
+    name: 'EcoTrack Admin',
+    email: 'admin@ecotrack.com',
     role: 'founder_admin',
     password: '123456',
   },

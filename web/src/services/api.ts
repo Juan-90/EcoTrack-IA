@@ -1,7 +1,3 @@
-// ─────────────────────────────────────────────────────────
-//  EcoTrack-IA — API Service
-//  Multi-tenant: injeta X-Tenant-ID em todas as requisições
-// ─────────────────────────────────────────────────────────
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import type { Bin, Truck, Route, DashboardStats, LoginResponse, Tenant } from '../types';
 import {
@@ -17,14 +13,12 @@ const api = axios.create({
   timeout: 10_000,
 });
 
-// ── Interceptor: JWT + Tenant ─────────────────────────────
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = localStorage.getItem('ecotrack_token');
   if (token && config.headers) {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
-  // Injeta tenant em TODAS as requisições
   const tenantRaw = localStorage.getItem('ecotrack-tenant');
   if (tenantRaw) {
     try {
@@ -32,13 +26,12 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
       if (state?.tenant?.id && config.headers) {
         config.headers['X-Tenant-ID'] = state.tenant.id;
       }
-    } catch { /* silencioso */ }
+    } catch {}
   }
 
   return config;
 });
 
-// ── Interceptor: 401 ─────────────────────────────────────
 api.interceptors.response.use(
   (res) => res,
   (err: AxiosError) => {
@@ -52,17 +45,15 @@ api.interceptors.response.use(
 
 const delay = (ms = 400) => new Promise((r) => setTimeout(r, ms));
 
-// ── Tenant ────────────────────────────────────────────────
 export const tenantApi = {
   validate: async (tenantId: string): Promise<Tenant> => {
     if (USE_MOCK) {
       await delay(600);
-      // Remove formatação do CNPJ para comparar
       const clean = tenantId.replace(/\D/g, '');
       const found = MOCK_TENANTS.find(
         t => t.id.replace(/\D/g, '') === clean || t.id === tenantId
       );
-      if (!found)  throw new Error('Tenant não encontrado');
+      if (!found) throw new Error('Tenant não encontrado');
       if (!found.active) throw new Error('Tenant inativo');
       return found;
     }
@@ -71,12 +62,13 @@ export const tenantApi = {
   },
 };
 
-// ── Auth ──────────────────────────────────────────────────
 export const authApi = {
-  login: async (email: string, password: string): Promise<LoginResponse> => {
+  login: async (tenantId: string, email: string, password: string): Promise<LoginResponse> => {
     const form = new URLSearchParams();
+    form.append('tenant', tenantId);
     form.append('username', email);
     form.append('password', password);
+
     const { data } = await api.post<LoginResponse>('/login', form, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     });
@@ -84,7 +76,6 @@ export const authApi = {
   },
 };
 
-// ── Bins ──────────────────────────────────────────────────
 export const binsApi = {
   getAll: async (): Promise<Bin[]> => {
     if (USE_MOCK) { await delay(); return MOCK_BINS; }
@@ -98,7 +89,6 @@ export const binsApi = {
   },
 };
 
-// ── Trucks ────────────────────────────────────────────────
 export const trucksApi = {
   getAll: async (): Promise<Truck[]> => {
     if (USE_MOCK) { await delay(); return MOCK_TRUCKS; }
@@ -107,7 +97,6 @@ export const trucksApi = {
   },
 };
 
-// ── Routes ────────────────────────────────────────────────
 export const routesApi = {
   getToday: async (): Promise<Route[]> => {
     if (USE_MOCK) { await delay(); return MOCK_ROUTES; }
@@ -121,7 +110,6 @@ export const routesApi = {
   },
 };
 
-// ── Stats ─────────────────────────────────────────────────
 export const statsApi = {
   get: async (): Promise<DashboardStats> => {
     if (USE_MOCK) { await delay(); return MOCK_STATS; }
